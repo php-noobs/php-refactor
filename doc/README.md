@@ -10,6 +10,9 @@ This documentation describes the `PhpRefactor` component, its orchestration role
 
 1. [Overview](01-overview.md)
 2. [Public Usage](02-public-usage.md)
+3. [Transaction Model](03-transaction-model.md)
+4. [Service Adapters](04-service-adapters.md)
+5. [Snapshots And Rollback](05-snapshots-and-rollback.md)
 
 ## External Dependencies
 
@@ -23,12 +26,14 @@ This documentation describes the `PhpRefactor` component, its orchestration role
 
 ## Current Layout
 
-The project is currently at documentation and orchestration-design stage.
+The project currently provides a first rename-backed orchestration slice.
 
 The intended layout is:
 
 - `Domain/` contains transaction intents, workflow results, diagnostics, and orchestration policies.
 - `Application/` contains the public facade and transaction API.
 - `Infrastructure/` adapts specialized services into composed workflows.
+
+The first adapter consumes the transaction-neutral `php-rename` step API. `PhpRefactor` owns the global transaction lifecycle and never nests `PhpRenameTransaction`.
 
 Navigation: [Next: Overview](01-overview.md)

@@ -2,11 +2,11 @@
 
 Navigation: [Documentation](README.md) | [Previous: Overview](01-overview.md)
 
-The public API should expose composed workflows while preserving the plan-before-apply model used by specialized services.
+The public API exposes composed workflows while preserving the plan-before-apply model used by specialized services.
 
 ## Intended Facade
 
-A future facade may look like this:
+The first facade supports rename-backed transactions:
 
 ```php
 use PhpNoobs\PhpRefactor\Application\PhpRefactor;
@@ -20,7 +20,7 @@ $transaction = $refactor->beginTransaction();
 
 $result = $transaction
     ->renameClassFqcn('App\\Mailer', 'App\\Infrastructure\\Sender')
-    ->changeMethodReturnType('App\\Infrastructure\\Sender', 'send', $typeNode, 'SendResult')
+    ->renameMethod('App\\Infrastructure\\Sender', 'send', 'deliver')
     ->commitAndSave();
 ```
 
@@ -44,10 +44,12 @@ Transactions should:
 - rollback earlier in-memory mutations when possible;
 - write through the final build source registry, not through direct filesystem writes.
 
+The first transaction implementation snapshots all loaded virtual files at `beginTransaction()`. It then delegates rename steps to `php-rename` and rolls back the global snapshot when a blocking diagnostic appears.
+
 ## Graph Freshness
 
 Identity-only rename operations can often use projected builds from `member-graph`.
 
 Operations that change type information or otherwise affect semantic resolution should use an in-memory rebuild from updated virtual files before planning the next step.
 
-Navigation: [Documentation](README.md) | [Previous: Overview](01-overview.md)
+Navigation: [Documentation](README.md) | [Previous: Overview](01-overview.md) | [Next: Transaction Model](03-transaction-model.md)

@@ -2,6 +2,7 @@
     "name": "php-noobs/php-refactor",
     "type": "library",
     "license": "MIT",
+    "description": "High-level PHP refactoring orchestrator for composed workflows across specialized services.",
     "autoload": {
         "psr-4": {
             "PhpNoobs\\PhpRefactor\\": "src/"
@@ -12,8 +13,25 @@
             "PhpNoobs\\PhpRefactor\\Tests\\": "tests/"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/php-noobs/member-graph"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/php-noobs/php-source-registry"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/php-noobs/php-rename"
+        }
+    ],
     "require": {
-        "php": ">=8.4"
+        "php": ">=8.4",
+        "php-noobs/member-graph": "dev-main",
+        "php-noobs/php-rename": "dev-main",
+        "php-noobs/php-source-registry": "dev-main"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5",
@@ -32,5 +50,7 @@
             "@analyse",
             "@test"
         ]
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

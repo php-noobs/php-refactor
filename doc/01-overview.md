@@ -34,9 +34,17 @@ Specialized services own their own operations:
 
 ## Current Status
 
-The current project is being prepared as the high-level package that will sit above completed or emerging services.
+The current project provides the first high-level package slice above `php-rename`.
 
-The first practical target should be a thin facade that builds or receives one `member-graph` build, creates specialized service instances from that build, then coordinates a small number of proven workflows.
+The first implementation:
+
+- builds or receives one `member-graph` build;
+- creates a global `PhpRefactorTransaction`;
+- snapshots all loaded virtual files at `beginTransaction()`;
+- delegates `renameClassFqcn()` and `renameMethod()` to `php-rename` step APIs;
+- aggregates diagnostics and action journal entries;
+- rolls back globally on blocking diagnostics or unexpected exceptions;
+- saves only through the final build source registry.
 
 ## Direction
 
