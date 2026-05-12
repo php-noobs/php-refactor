@@ -85,6 +85,33 @@ final class PhpRefactorTransaction
     }
 
     /**
+     * Delegates one short class rename to php-rename.
+     *
+     * @param string               $className      the current class-like FQCN
+     * @param string               $newClassName   the replacement short class-like name
+     * @param RenameConflictPolicy $conflictPolicy the rename conflict policy
+     */
+    public function renameClass(
+        string $className,
+        string $newClassName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameClass',
+            arguments: [
+                'className' => $className,
+                'newClassName' => $newClassName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameClass(
+                context: $context,
+                className: $className,
+                newClassName: $newClassName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
      * Delegates one method rename to php-rename.
      *
      * @param string               $className      the class name that anchors the method rename
@@ -110,6 +137,281 @@ final class PhpRefactorTransaction
                 className: $className,
                 methodName: $methodName,
                 newMethodName: $newMethodName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one property rename to php-rename.
+     *
+     * @param string               $className       the class name that anchors the property rename
+     * @param string               $propertyName    the current property name
+     * @param string               $newPropertyName the replacement property name
+     * @param RenameConflictPolicy $conflictPolicy  the rename conflict policy
+     */
+    public function renameProperty(
+        string $className,
+        string $propertyName,
+        string $newPropertyName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameProperty',
+            arguments: [
+                'className' => $className,
+                'propertyName' => $propertyName,
+                'newPropertyName' => $newPropertyName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameProperty(
+                context: $context,
+                className: $className,
+                propertyName: $propertyName,
+                newPropertyName: $newPropertyName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one class-constant rename to php-rename.
+     *
+     * @param string               $className       the class name that anchors the class-constant rename
+     * @param string               $constantName    the current class-constant name
+     * @param string               $newConstantName the replacement class-constant name
+     * @param RenameConflictPolicy $conflictPolicy  the rename conflict policy
+     */
+    public function renameClassConstant(
+        string $className,
+        string $constantName,
+        string $newConstantName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameClassConstant',
+            arguments: [
+                'className' => $className,
+                'constantName' => $constantName,
+                'newConstantName' => $newConstantName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameClassConstant(
+                context: $context,
+                className: $className,
+                constantName: $constantName,
+                newConstantName: $newConstantName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one enum-case rename to php-rename.
+     *
+     * @param string               $enumName       the enum name that anchors the enum-case rename
+     * @param string               $caseName       the current enum-case name
+     * @param string               $newCaseName    the replacement enum-case name
+     * @param RenameConflictPolicy $conflictPolicy the rename conflict policy
+     */
+    public function renameEnumCase(
+        string $enumName,
+        string $caseName,
+        string $newCaseName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameEnumCase',
+            arguments: [
+                'enumName' => $enumName,
+                'caseName' => $caseName,
+                'newCaseName' => $newCaseName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameEnumCase(
+                context: $context,
+                enumName: $enumName,
+                caseName: $caseName,
+                newCaseName: $newCaseName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one short function rename to php-rename.
+     *
+     * @param string               $functionName    the current function FQCN
+     * @param string               $newFunctionName the replacement short function name
+     * @param RenameConflictPolicy $conflictPolicy  the rename conflict policy
+     */
+    public function renameFunction(
+        string $functionName,
+        string $newFunctionName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'newFunctionName' => $newFunctionName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameFunction(
+                context: $context,
+                functionName: $functionName,
+                newFunctionName: $newFunctionName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one function FQCN rename to php-rename.
+     *
+     * @param string               $functionName    the current function FQCN
+     * @param string               $newFunctionName the replacement function FQCN
+     * @param RenameConflictPolicy $conflictPolicy  the rename conflict policy
+     */
+    public function renameFunctionFqcn(
+        string $functionName,
+        string $newFunctionName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameFunctionFqcn',
+            arguments: [
+                'functionName' => $functionName,
+                'newFunctionName' => $newFunctionName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameFunctionFqcn(
+                context: $context,
+                functionName: $functionName,
+                newFunctionName: $newFunctionName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one short namespace-level constant rename to php-rename.
+     *
+     * @param string               $constantName    the current constant FQCN
+     * @param string               $newConstantName the replacement short constant name
+     * @param RenameConflictPolicy $conflictPolicy  the rename conflict policy
+     */
+    public function renameConstant(
+        string $constantName,
+        string $newConstantName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameConstant',
+            arguments: [
+                'constantName' => $constantName,
+                'newConstantName' => $newConstantName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameConstant(
+                context: $context,
+                constantName: $constantName,
+                newConstantName: $newConstantName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one namespace-level constant FQCN rename to php-rename.
+     *
+     * @param string               $constantName    the current constant FQCN
+     * @param string               $newConstantName the replacement constant FQCN
+     * @param RenameConflictPolicy $conflictPolicy  the rename conflict policy
+     */
+    public function renameConstantFqcn(
+        string $constantName,
+        string $newConstantName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameConstantFqcn',
+            arguments: [
+                'constantName' => $constantName,
+                'newConstantName' => $newConstantName,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameConstantFqcn(
+                context: $context,
+                constantName: $constantName,
+                newConstantName: $newConstantName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one method parameter rename to php-rename.
+     *
+     * @param string               $className        the method owner FQCN
+     * @param string               $methodName       the method name
+     * @param string               $parameterName    the current parameter name without "$"
+     * @param string               $newParameterName the replacement parameter name without "$"
+     * @param int|null             $parameterIndex   the optional zero-based declaration index
+     * @param RenameConflictPolicy $conflictPolicy   the rename conflict policy
+     */
+    public function renameMethodParameter(
+        string $className,
+        string $methodName,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameMethodParameter',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameMethodParameter(
+                context: $context,
+                className: $className,
+                methodName: $methodName,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one function parameter rename to php-rename.
+     *
+     * @param string               $functionName     the function FQCN
+     * @param string               $parameterName    the current parameter name without "$"
+     * @param string               $newParameterName the replacement parameter name without "$"
+     * @param int|null             $parameterIndex   the optional zero-based declaration index
+     * @param RenameConflictPolicy $conflictPolicy   the rename conflict policy
+     */
+    public function renameFunctionParameter(
+        string $functionName,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): self {
+        return $this->executeStep(
+            operation: 'renameFunctionParameter',
+            arguments: [
+                'functionName' => $functionName,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->renameServiceAdapter->renameFunctionParameter(
+                context: $context,
+                functionName: $functionName,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
                 conflictPolicy: $conflictPolicy,
             ),
         );

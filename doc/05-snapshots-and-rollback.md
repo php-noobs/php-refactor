@@ -4,9 +4,9 @@ Navigation: [Documentation](README.md) | [Previous: Service Adapters](04-service
 
 `php-refactor` owns global source snapshots.
 
-The first implementation snapshots every loaded `VirtualPhpSourceFile` when `beginTransaction()` is called.
+The implementation snapshots every loaded `VirtualPhpSourceFile` when `beginTransaction()` is called.
 
-This is intentionally broader than the eventually optimized model. It keeps rollback service-neutral: the same snapshot mechanism can restore source mutations made by `php-rename`, `php-retype`, `php-clone`, or future services.
+This keeps rollback independent from `php-rename`: the global transaction restores source state without calling `PhpRenameTransaction`.
 
 ## Snapshot Contents
 
@@ -33,11 +33,5 @@ Rollback is triggered when:
 - a step produces blocking diagnostics;
 - an unexpected exception is thrown during step execution;
 - `commit()` sees accumulated error diagnostics.
-
-## Future Optimization
-
-Later versions may snapshot only files that a service plans to mutate.
-
-That optimization requires reliable pre-apply touched-file information from every participating service. Until then, begin-transaction snapshots are safer and keep the global rollback contract simple.
 
 Navigation: [Documentation](README.md) | [Previous: Service Adapters](04-service-adapters.md)
