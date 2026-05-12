@@ -105,6 +105,7 @@ final class PhpRefactorPublicApiContractTest extends TestCase
             'changeFunctionParameterType',
             'changeMethodReturnType',
             'changeFunctionReturnType',
+            'changePropertyType',
         ];
     }
 }

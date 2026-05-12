@@ -581,6 +581,39 @@ final class PhpRefactorTransaction
     }
 
     /**
+     * Delegates one property type change to php-retype.
+     *
+     * @param string                                                       $className     the property owner FQCN
+     * @param string|list<string>                                          $propertyNames the property name or property names without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode      the native PHP type node to write
+     * @param string|null                                                  $docType       the PHPDoc type to write in the `@var` tag
+     */
+    public function changePropertyType(
+        string $className,
+        string|array $propertyNames,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): self {
+        return $this->executeStep(
+            service: RetypeServiceAdapter::SERVICE,
+            operation: 'changePropertyType',
+            arguments: [
+                'className' => $className,
+                'propertyNames' => $this->propertyNamesLabel($propertyNames),
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->retypeServiceAdapter->changePropertyType(
+                context: $context,
+                className: $className,
+                propertyNames: $propertyNames,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
      * Commits the global transaction in memory.
      */
     public function commit(): RefactorTransactionResult
@@ -720,5 +753,19 @@ final class PhpRefactorTransaction
         }
 
         return $typeNode::class;
+    }
+
+    /**
+     * Returns a stable journal label for one or more property names.
+     *
+     * @param string|list<string> $propertyNames the property name or property names without "$"
+     */
+    private function propertyNamesLabel(string|array $propertyNames): string
+    {
+        if (is_string($propertyNames)) {
+            return $propertyNames;
+        }
+
+        return implode(',', $propertyNames);
     }
 }

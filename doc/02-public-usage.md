@@ -42,9 +42,12 @@ The same build and source registry are shared across rename and retype steps.
 - `changeMethodParameterType()`;
 - `changeFunctionParameterType()`;
 - `changeMethodReturnType()`;
-- `changeFunctionReturnType()`.
+- `changeFunctionReturnType()`;
+- `changePropertyType()`.
 
 Each method accepts a PHP-Parser type node for the native type and an optional PHPDoc type string. A `null` native type removes the native declaration while preserving the PHPDoc change when a doc type is provided.
+
+`changePropertyType()` accepts one property name or a list of property names. Grouped property declaration splitting, promoted property mutation, and direct `@var` updates are handled by `php-retype`.
 
 ## Transaction Rules
 

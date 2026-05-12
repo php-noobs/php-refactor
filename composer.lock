@@ -70,12 +70,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-noobs/member-graph.git",
-                "reference": "51b8cd2ed1fed2e9ab1410ce6e615a895cc5631c"
+                "reference": "602b34e0d01e81ea9a01db416d075e040c66e347"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-noobs/member-graph/zipball/51b8cd2ed1fed2e9ab1410ce6e615a895cc5631c",
-                "reference": "51b8cd2ed1fed2e9ab1410ce6e615a895cc5631c",
+                "url": "https://api.github.com/repos/php-noobs/member-graph/zipball/602b34e0d01e81ea9a01db416d075e040c66e347",
+                "reference": "602b34e0d01e81ea9a01db416d075e040c66e347",
                 "shasum": ""
             },
             "require": {
@@ -130,7 +130,7 @@
                 "source": "https://github.com/php-noobs/member-graph/tree/main",
                 "issues": "https://github.com/php-noobs/member-graph/issues"
             },
-            "time": "2026-05-11T12:02:22+00:00"
+            "time": "2026-05-12T16:27:10+00:00"
         },
         {
             "name": "php-noobs/php-rename",
@@ -205,12 +205,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-noobs/php-retype.git",
-                "reference": "23f5e3ab4d5670f293c8402f08c3c860f61a9ae8"
+                "reference": "ff4888b92d5fd44ca7673c0932074ec6b59775b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-noobs/php-retype/zipball/23f5e3ab4d5670f293c8402f08c3c860f61a9ae8",
-                "reference": "23f5e3ab4d5670f293c8402f08c3c860f61a9ae8",
+                "url": "https://api.github.com/repos/php-noobs/php-retype/zipball/ff4888b92d5fd44ca7673c0932074ec6b59775b4",
+                "reference": "ff4888b92d5fd44ca7673c0932074ec6b59775b4",
                 "shasum": ""
             },
             "require": {
@@ -264,7 +264,7 @@
                 "source": "https://github.com/php-noobs/php-retype/tree/main",
                 "issues": "https://github.com/php-noobs/php-retype/issues"
             },
-            "time": "2026-05-12T14:29:48+00:00"
+            "time": "2026-05-12T16:56:24+00:00"
         },
         {
             "name": "php-noobs/php-source-registry",

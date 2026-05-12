@@ -8,6 +8,7 @@ Its responsibility is to compose safe operations in a coherent order:
 
 - rename symbols through `php-rename`;
 - change native and PHPDoc types through `php-retype`;
+- delegate property declaration splitting and promoted property handling to `php-retype`;
 - keep graph state fresh between operations;
 - save source changes only through `php-source-registry`.
 

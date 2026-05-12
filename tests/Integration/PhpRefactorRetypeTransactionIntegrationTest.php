@@ -97,6 +97,113 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
     }
 
     /**
+     * Ensures a global transaction can change a property type in memory.
+     */
+    public function testItCommitsPropertyTypeChangeInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeSinglePropertyMailerFile($srcDirectory.'/Mailer.php');
+        $this->writeTransportFile($srcDirectory.'/Transport.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changePropertyType('App\\Mailer', 'transport', new Name('Transport'), 'Transport')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('@var Transport', $printedCode);
+        self::assertStringContainsString('private Transport $transport;', $printedCode);
+    }
+
+    /**
+     * Ensures a partial grouped property declaration can be split through the global transaction.
+     */
+    public function testItReflectsGroupedPropertyPartialRetypeInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeGroupedPropertyMailerFile($srcDirectory.'/Mailer.php');
+        $this->writeTransportFile($srcDirectory.'/Transport.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changePropertyType('App\\Mailer', ['transport', 'backupTransport'], new Name('Transport'), 'Transport')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('@var Transport', $printedCode);
+        self::assertStringContainsString('private Transport $transport, $backupTransport;', $printedCode);
+        self::assertStringContainsString('@var string', $printedCode);
+        self::assertStringContainsString('private string $legacyTransport;', $printedCode);
+    }
+
+    /**
+     * Ensures promoted property types can be changed through the global transaction.
+     */
+    public function testItCommitsPromotedPropertyTypeChangeInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writePromotedPropertyMailerFile($srcDirectory.'/Mailer.php');
+        $this->writeTransportFile($srcDirectory.'/Transport.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changePropertyType('App\\Mailer', 'transport', new Name('Transport'), 'Transport')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('@var Transport', $printedCode);
+        self::assertStringContainsString('public Transport $transport', $printedCode);
+    }
+
+    /**
+     * Ensures php-retype consumes the graph updated by a previous property rename step.
+     */
+    public function testItUsesUpdatedGraphBetweenPropertyRenameAndPropertyRetypeSteps(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeSinglePropertyMailerFile($srcDirectory.'/Mailer.php');
+        $this->writeTransportFile($srcDirectory.'/Transport.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameProperty('App\\Mailer', 'transport', 'primaryTransport')
+            ->changePropertyType('App\\Mailer', 'primaryTransport', new Name('Transport'), 'Transport')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('private Transport $primaryTransport;', $printedCode);
+        self::assertStringNotContainsString('$transport;', $printedCode);
+    }
+
+    /**
      * Ensures php-retype consumes the graph updated by a previous php-rename step.
      */
     public function testItUsesUpdatedGraphBetweenRenameAndRetypeSteps(): void
@@ -168,6 +275,32 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
         self::assertFalse($result->isSuccessful());
         self::assertStringContainsString('function send(string $message): string', $printedCode);
         self::assertStringNotContainsString('function deliver(', $printedCode);
+    }
+
+    /**
+     * Ensures a failed workflow with property retype restores the begin-transaction virtual files.
+     */
+    public function testItRollsBackVirtualFilesAfterFailingPropertyRetypeWorkflow(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeSinglePropertyMailerFile($srcDirectory.'/Mailer.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameProperty('App\\Mailer', 'transport', 'primaryTransport')
+            ->changePropertyType('App\\Mailer', 'primaryTransport', new NullableType(new Identifier('void')), '?void')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::ROLLED_BACK, $result->status);
+        self::assertFalse($result->isSuccessful());
+        self::assertStringContainsString('private string $transport;', $printedCode);
+        self::assertStringNotContainsString('$primaryTransport', $printedCode);
     }
 
     /**
@@ -248,6 +381,93 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
             function normalize(string $message): string
             {
                 return $message;
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the single property mailer fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeSinglePropertyMailerFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Mailer
+            {
+                /**
+                 * @var string
+                 */
+                private string $transport;
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the grouped property mailer fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeGroupedPropertyMailerFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Mailer
+            {
+                /**
+                 * @var string
+                 */
+                private string $transport, $backupTransport, $legacyTransport;
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the promoted property mailer fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writePromotedPropertyMailerFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Mailer
+            {
+                public function __construct(
+                    /**
+                     * @var string
+                     */
+                    public string $transport,
+                ) {
+                }
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the transport fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeTransportFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Transport
+            {
             }
             PHP);
     }

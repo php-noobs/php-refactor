@@ -183,6 +183,41 @@ final readonly class RetypeServiceAdapter
     }
 
     /**
+     * Executes one property type-change step.
+     *
+     * @param RefactorTransactionContext                                   $context       the current refactor context
+     * @param string                                                       $className     the property owner FQCN
+     * @param string|list<string>                                          $propertyNames the property name or property names without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode      the native PHP type node to write
+     * @param string|null                                                  $docType       the PHPDoc type to write in the `@var` tag
+     */
+    public function changePropertyType(
+        RefactorTransactionContext $context,
+        string $className,
+        string|array $propertyNames,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changePropertyType',
+            arguments: [
+                'className' => $className,
+                'propertyNames' => $this->propertyNamesLabel($propertyNames),
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepPropertyTypeChange(
+                context: $retypeContext,
+                className: $className,
+                propertyNames: $propertyNames,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
      * Executes a retype step and maps it back into the global context.
      *
      * @param RefactorTransactionContext                    $context   the current refactor context
@@ -241,5 +276,19 @@ final readonly class RetypeServiceAdapter
         }
 
         return $typeNode::class;
+    }
+
+    /**
+     * Returns a stable journal label for one or more property names.
+     *
+     * @param string|list<string> $propertyNames the property name or property names without "$"
+     */
+    private function propertyNamesLabel(string|array $propertyNames): string
+    {
+        if (is_string($propertyNames)) {
+            return $propertyNames;
+        }
+
+        return implode(',', $propertyNames);
     }
 }

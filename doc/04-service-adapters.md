@@ -48,7 +48,10 @@ The supported operations mirror the `php-retype` orchestrable step API:
 - `changeMethodParameterType()`;
 - `changeFunctionParameterType()`;
 - `changeMethodReturnType()`;
-- `changeFunctionReturnType()`.
+- `changeFunctionReturnType()`;
+- `changePropertyType()`.
+
+Property type changes include single properties, grouped properties, partial grouped declaration splitting, promoted properties, and direct `@var` updates. Those behaviors are provided by `php-retype`; the adapter only maps the global transaction context into the retype step API and maps the result back.
 
 `php-refactor` does not call `PhpRetypeTransaction`. That transaction belongs to standalone `php-retype` usage only.
 

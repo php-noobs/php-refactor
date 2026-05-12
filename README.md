@@ -83,8 +83,11 @@ if (false === $result->isSuccessful()) {
 - `changeFunctionParameterType()`
 - `changeMethodReturnType()`
 - `changeFunctionReturnType()`
+- `changePropertyType()`
 
 `PhpRefactor` owns the cross-service transaction. It calls service step APIs and never nests `PhpRenameTransaction` or `PhpRetypeTransaction`.
+
+Property type changes support single properties, grouped property declarations, grouped declaration splitting, promoted properties, and direct `@var` updates through `php-retype`.
 
 ## Documentation
 
