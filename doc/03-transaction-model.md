@@ -54,4 +54,10 @@ Unexpected exceptions are converted into error diagnostics, journaled, and follo
 
 Specialized services do not write physical files during global orchestration.
 
+## Service Transactions
+
+`PhpRefactorTransaction` owns the cross-service transaction. It calls transaction-neutral service step APIs and never opens service-local transactions.
+
+`PhpRenameTransaction` and `PhpRetypeTransaction` remain standalone entry points for their own packages. They are not nested inside a `PhpRefactorTransaction`.
+
 Navigation: [Documentation](README.md) | [Previous: Public Usage](02-public-usage.md) | [Next: Service Adapters](04-service-adapters.md)

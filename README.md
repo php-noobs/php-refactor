@@ -2,7 +2,7 @@
 
 `PhpRefactor` is the high-level transaction orchestrator for safe PHP refactoring workflows.
 
-It currently coordinates `php-noobs/php-rename` operations through one global transaction. It owns transaction lifecycle, source snapshots, rollback, diagnostics aggregation, and final persistence.
+It coordinates `php-noobs/php-rename` and `php-noobs/php-retype` operations through one global transaction. It owns transaction lifecycle, source snapshots, rollback, diagnostics aggregation, cross-service graph freshness, and final persistence.
 
 ## Installation
 
@@ -26,6 +26,10 @@ When using the PhpNoobs packages from GitHub, configure the VCS repositories:
         {
             "type": "vcs",
             "url": "https://github.com/php-noobs/php-rename"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/php-noobs/php-retype"
         }
     ]
 }
@@ -35,6 +39,7 @@ When using the PhpNoobs packages from GitHub, configure the VCS repositories:
 
 ```php
 use PhpNoobs\PhpRefactor\Application\PhpRefactor;
+use PhpParser\Node\Name;
 
 $refactor = PhpRefactor::fromDirectory(
     directories: [$projectPath . '/src'],
@@ -45,6 +50,7 @@ $result = $refactor
     ->beginTransaction()
     ->renameClassFqcn('App\\Mailer', 'App\\Infrastructure\\Sender')
     ->renameMethod('App\\Infrastructure\\Sender', 'send', 'deliver')
+    ->changeMethodReturnType('App\\Infrastructure\\Sender', 'deliver', new Name('DeliveryResult'), 'DeliveryResult')
     ->commitAndSave();
 
 if (false === $result->isSuccessful()) {
@@ -70,6 +76,15 @@ if (false === $result->isSuccessful()) {
 - `renameConstantFqcn()`
 - `renameMethodParameter()`
 - `renameFunctionParameter()`
+
+## Supported Type-Change Operations
+
+- `changeMethodParameterType()`
+- `changeFunctionParameterType()`
+- `changeMethodReturnType()`
+- `changeFunctionReturnType()`
+
+`PhpRefactor` owns the cross-service transaction. It calls service step APIs and never nests `PhpRenameTransaction` or `PhpRetypeTransaction`.
 
 ## Documentation
 

@@ -43,6 +43,19 @@ final class PhpRefactorPublicApiContractTest extends TestCase
     }
 
     /**
+     * Ensures the transaction exposes every php-retype step supported by php-refactor.
+     */
+    public function testTransactionRetypePublicApiIsStable(): void
+    {
+        $transaction = new \ReflectionClass(PhpRefactorTransaction::class);
+
+        foreach ($this->retypeMethods() as $methodName) {
+            self::assertTrue($transaction->hasMethod($methodName), sprintf('Missing method %s.', $methodName));
+            self::assertTrue($transaction->getMethod($methodName)->isPublic(), sprintf('Method %s is not public.', $methodName));
+        }
+    }
+
+    /**
      * Ensures transaction completion methods return the global transaction result.
      */
     public function testTransactionCompletionPublicApiIsStable(): void
@@ -77,6 +90,21 @@ final class PhpRefactorPublicApiContractTest extends TestCase
             'renameConstantFqcn',
             'renameMethodParameter',
             'renameFunctionParameter',
+        ];
+    }
+
+    /**
+     * Returns the retype methods exposed by the global transaction.
+     *
+     * @return list<string>
+     */
+    private function retypeMethods(): array
+    {
+        return [
+            'changeMethodParameterType',
+            'changeFunctionParameterType',
+            'changeMethodReturnType',
+            'changeFunctionReturnType',
         ];
     }
 }

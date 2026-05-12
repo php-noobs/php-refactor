@@ -7,6 +7,7 @@ Navigation: [Documentation](README.md) | [Previous: Documentation](README.md) | 
 Its responsibility is to compose safe operations in a coherent order:
 
 - rename symbols through `php-rename`;
+- change native and PHPDoc types through `php-retype`;
 - keep graph state fresh between operations;
 - save source changes only through `php-source-registry`.
 
@@ -32,7 +33,7 @@ Specialized services own their own operations:
 
 ## Current Status
 
-The current package provides the high-level transaction layer above `php-rename`.
+The package provides the high-level transaction layer above `php-rename` and `php-retype`.
 
 The implementation:
 
@@ -40,12 +41,9 @@ The implementation:
 - creates a global `PhpRefactorTransaction`;
 - snapshots all loaded virtual files at `beginTransaction()`;
 - delegates rename operations to `php-rename` step APIs;
+- delegates type-change operations to `php-retype` step APIs;
 - aggregates diagnostics and action journal entries;
 - rolls back globally on blocking diagnostics or unexpected exceptions;
 - saves only through the final build source registry.
-
-## Direction
-
-The package grows from concrete composed workflows. The current workflow family is rename orchestration through `php-rename`.
 
 Navigation: [Documentation](README.md) | [Previous: Documentation](README.md) | [Next: Public Usage](02-public-usage.md)

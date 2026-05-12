@@ -25,12 +25,17 @@
         {
             "type": "vcs",
             "url": "https://github.com/php-noobs/php-rename"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/php-noobs/php-retype"
         }
     ],
     "require": {
         "php": ">=8.4",
         "php-noobs/member-graph": "dev-main",
         "php-noobs/php-rename": "dev-main",
+        "php-noobs/php-retype": "dev-main",
         "php-noobs/php-source-registry": "dev-main"
     },
     "require-dev": {

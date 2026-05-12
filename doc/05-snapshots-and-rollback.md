@@ -6,7 +6,7 @@ Navigation: [Documentation](README.md) | [Previous: Service Adapters](04-service
 
 The implementation snapshots every loaded `VirtualPhpSourceFile` when `beginTransaction()` is called.
 
-This keeps rollback independent from `php-rename`: the global transaction restores source state without calling `PhpRenameTransaction`.
+This keeps rollback independent from specialized services: the global transaction restores source state without calling `PhpRenameTransaction` or `PhpRetypeTransaction`.
 
 ## Snapshot Contents
 
@@ -33,5 +33,7 @@ Rollback is triggered when:
 - a step produces blocking diagnostics;
 - an unexpected exception is thrown during step execution;
 - `commit()` sees accumulated error diagnostics.
+
+The restored build is the build returned in the final transaction result, so callers inspect the same virtual file state that remains after rollback.
 
 Navigation: [Documentation](README.md) | [Previous: Service Adapters](04-service-adapters.md)

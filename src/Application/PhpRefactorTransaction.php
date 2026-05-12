@@ -7,6 +7,7 @@ namespace PhpNoobs\PhpRefactor\Application;
 use PhpNoobs\MemberGraph\Application\Build\Factory\MemberDependencyGraphBuild;
 use PhpNoobs\MemberGraph\Application\Build\Factory\MemberDependencyGraphFactory;
 use PhpNoobs\PhpRefactor\Application\Adapter\RenameServiceAdapter;
+use PhpNoobs\PhpRefactor\Application\Adapter\RetypeServiceAdapter;
 use PhpNoobs\PhpRefactor\Application\Snapshot\VirtualFileSnapshotCollection;
 use PhpNoobs\PhpRefactor\Application\Snapshot\VirtualFileSnapshotter;
 use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnostic;
@@ -18,6 +19,11 @@ use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
 use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionStatus;
 use PhpNoobs\PhpRename\Domain\Rename\Conflict\RenameConflictPolicy;
 use PhpNoobs\PhpSource\VirtualPhpSourceFileCollection;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\IntersectionType;
+use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
+use PhpParser\Node\UnionType;
 
 /**
  * Coordinates one global multi-service refactor transaction.
@@ -30,11 +36,13 @@ final class PhpRefactorTransaction
      * @param RefactorTransactionContext    $context              the current transaction context
      * @param VirtualFileSnapshotCollection $snapshots            the global begin-transaction snapshots
      * @param RenameServiceAdapter          $renameServiceAdapter the rename service adapter
+     * @param RetypeServiceAdapter          $retypeServiceAdapter the retype service adapter
      */
     private function __construct(
         private RefactorTransactionContext $context,
         private readonly VirtualFileSnapshotCollection $snapshots,
         private readonly RenameServiceAdapter $renameServiceAdapter,
+        private readonly RetypeServiceAdapter $retypeServiceAdapter,
     ) {
     }
 
@@ -43,17 +51,20 @@ final class PhpRefactorTransaction
      *
      * @param MemberDependencyGraphBuild $build                the initial build
      * @param RenameServiceAdapter       $renameServiceAdapter the rename service adapter
+     * @param RetypeServiceAdapter       $retypeServiceAdapter the retype service adapter
      * @param VirtualFileSnapshotter     $snapshotter          the global virtual file snapshotter
      */
     public static function begin(
         MemberDependencyGraphBuild $build,
         RenameServiceAdapter $renameServiceAdapter,
+        RetypeServiceAdapter $retypeServiceAdapter,
         VirtualFileSnapshotter $snapshotter,
     ): self {
         return new self(
             context: RefactorTransactionContext::fromBuild($build),
             snapshots: $snapshotter->snapshot($build->virtualFiles),
             renameServiceAdapter: $renameServiceAdapter,
+            retypeServiceAdapter: $retypeServiceAdapter,
         );
     }
 
@@ -70,6 +81,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameClassFqcn',
             arguments: [
                 'className' => $className,
@@ -97,6 +109,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameClass',
             arguments: [
                 'className' => $className,
@@ -126,6 +139,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameMethod',
             arguments: [
                 'className' => $className,
@@ -157,6 +171,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameProperty',
             arguments: [
                 'className' => $className,
@@ -188,6 +203,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameClassConstant',
             arguments: [
                 'className' => $className,
@@ -219,6 +235,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameEnumCase',
             arguments: [
                 'enumName' => $enumName,
@@ -248,6 +265,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameFunction',
             arguments: [
                 'functionName' => $functionName,
@@ -275,6 +293,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameFunctionFqcn',
             arguments: [
                 'functionName' => $functionName,
@@ -302,6 +321,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameConstant',
             arguments: [
                 'constantName' => $constantName,
@@ -329,6 +349,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameConstantFqcn',
             arguments: [
                 'constantName' => $constantName,
@@ -362,6 +383,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameMethodParameter',
             arguments: [
                 'className' => $className,
@@ -399,6 +421,7 @@ final class PhpRefactorTransaction
         RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
     ): self {
         return $this->executeStep(
+            service: RenameServiceAdapter::SERVICE,
             operation: 'renameFunctionParameter',
             arguments: [
                 'functionName' => $functionName,
@@ -413,6 +436,146 @@ final class PhpRefactorTransaction
                 newParameterName: $newParameterName,
                 parameterIndex: $parameterIndex,
                 conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one method parameter type change to php-retype.
+     *
+     * @param string                                                       $className      the method owner FQCN
+     * @param string                                                       $methodName     the method name
+     * @param string                                                       $parameterName  the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode       the native PHP type node to write
+     * @param string|null                                                  $docType        the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex the optional zero-based declaration index
+     */
+    public function changeMethodParameterType(
+        string $className,
+        string $methodName,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): self {
+        return $this->executeStep(
+            service: RetypeServiceAdapter::SERVICE,
+            operation: 'changeMethodParameterType',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->retypeServiceAdapter->changeMethodParameterType(
+                context: $context,
+                className: $className,
+                methodName: $methodName,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one function parameter type change to php-retype.
+     *
+     * @param string                                                       $functionName   the function FQCN
+     * @param string                                                       $parameterName  the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode       the native PHP type node to write
+     * @param string|null                                                  $docType        the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex the optional zero-based declaration index
+     */
+    public function changeFunctionParameterType(
+        string $functionName,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): self {
+        return $this->executeStep(
+            service: RetypeServiceAdapter::SERVICE,
+            operation: 'changeFunctionParameterType',
+            arguments: [
+                'functionName' => $functionName,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->retypeServiceAdapter->changeFunctionParameterType(
+                context: $context,
+                functionName: $functionName,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one method return type change to php-retype.
+     *
+     * @param string                                                       $className  the method owner FQCN
+     * @param string                                                       $methodName the method name
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode   the native PHP type node to write
+     * @param string|null                                                  $docType    the PHPDoc type to write in the `@return` tag
+     */
+    public function changeMethodReturnType(
+        string $className,
+        string $methodName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): self {
+        return $this->executeStep(
+            service: RetypeServiceAdapter::SERVICE,
+            operation: 'changeMethodReturnType',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->retypeServiceAdapter->changeMethodReturnType(
+                context: $context,
+                className: $className,
+                methodName: $methodName,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one function return type change to php-retype.
+     *
+     * @param string                                                       $functionName the function FQCN
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode     the native PHP type node to write
+     * @param string|null                                                  $docType      the PHPDoc type to write in the `@return` tag
+     */
+    public function changeFunctionReturnType(
+        string $functionName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): self {
+        return $this->executeStep(
+            service: RetypeServiceAdapter::SERVICE,
+            operation: 'changeFunctionReturnType',
+            arguments: [
+                'functionName' => $functionName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->retypeServiceAdapter->changeFunctionReturnType(
+                context: $context,
+                functionName: $functionName,
+                typeNode: $typeNode,
+                docType: $docType,
             ),
         );
     }
@@ -498,11 +661,13 @@ final class PhpRefactorTransaction
     /**
      * Executes one guarded transaction step.
      *
+     * @param string                                                           $service   the service adapter name
      * @param string                                                           $operation the operation name
      * @param array<string, scalar|null>                                       $arguments the operation arguments
      * @param callable(RefactorTransactionContext): RefactorTransactionContext $callback  the step callback
      */
     private function executeStep(
+        string $service,
         string $operation,
         array $arguments,
         callable $callback,
@@ -517,10 +682,10 @@ final class PhpRefactorTransaction
             $diagnostics = RefactorDiagnosticCollection::empty()->add(new RefactorDiagnostic(
                 severity: RefactorDiagnosticSeverity::ERROR,
                 message: $exception->getMessage(),
-                service: RenameServiceAdapter::SERVICE,
+                service: $service,
             ));
             $entry = new RefactorActionJournalEntry(
-                service: RenameServiceAdapter::SERVICE,
+                service: $service,
                 operation: $operation,
                 arguments: $arguments,
                 applied: false,
@@ -541,5 +706,19 @@ final class PhpRefactorTransaction
         }
 
         return $this;
+    }
+
+    /**
+     * Returns a stable journal label for a PHP-Parser type node.
+     *
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode the native PHP type node
+     */
+    private function typeNodeLabel(Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode): ?string
+    {
+        if (null === $typeNode) {
+            return null;
+        }
+
+        return $typeNode::class;
     }
 }
