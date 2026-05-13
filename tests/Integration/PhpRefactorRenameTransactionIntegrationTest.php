@@ -120,6 +120,58 @@ final class PhpRefactorRenameTransactionIntegrationTest extends TestCase
     }
 
     /**
+     * Ensures nested callable parameter rename is orchestrated through the global transaction.
+     */
+    public function testItCommitsNestedCallableParameterRenameInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeNestedCallableMailerFile($srcDirectory.'/Mailer.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameClosureParameterInMethod('App\\Mailer', 'send', 0, 'message', 'payload', 0)
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('function (string $payload): string', $printedCode);
+        self::assertStringContainsString('$label = $payload;', $printedCode);
+        self::assertStringNotContainsString('$label = $message;', $printedCode);
+    }
+
+    /**
+     * Ensures nested callable local variable rename is orchestrated through the global transaction.
+     */
+    public function testItCommitsNestedCallableLocalVariableRenameInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeNestedCallableMailerFile($srcDirectory.'/Mailer.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameClosureLocalVariableInMethod('App\\Mailer', 'send', 0, 'label', 'normalized')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('$normalized = $message;', $printedCode);
+        self::assertStringContainsString('return $normalized;', $printedCode);
+        self::assertStringNotContainsString('$label = $message;', $printedCode);
+    }
+
+    /**
      * Writes the mailer fixture.
      *
      * @param string $filePath the file path
@@ -140,6 +192,33 @@ final class PhpRefactorRenameTransactionIntegrationTest extends TestCase
 
                 public function call(): void
                 {
+                }
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the nested callable mailer fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeNestedCallableMailerFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Mailer
+            {
+                public function send(): void
+                {
+                    $formatter = function (string $message): string {
+                        $label = $message;
+
+                        return $label;
+                    };
+                    $formatter('hello');
                 }
             }
             PHP);

@@ -33,7 +33,23 @@ The supported operations mirror the `php-rename` orchestrable step API:
 - `renameConstant()`;
 - `renameConstantFqcn()`;
 - `renameMethodParameter()`;
-- `renameFunctionParameter()`.
+- `renameFunctionParameter()`;
+- `renameNestedCallableParameter()`;
+- `renameClosureParameterInMethod()`;
+- `renameArrowFunctionParameterInMethod()`;
+- `renameClosureParameterInFunction()`;
+- `renameArrowFunctionParameterInFunction()`;
+- `renameClosureParameterInFile()`;
+- `renameArrowFunctionParameterInFile()`;
+- `renameNestedCallableLocalVariable()`;
+- `renameClosureLocalVariableInMethod()`;
+- `renameArrowFunctionLocalVariableInMethod()`;
+- `renameClosureLocalVariableInFunction()`;
+- `renameArrowFunctionLocalVariableInFunction()`;
+- `renameClosureLocalVariableInFile()`;
+- `renameArrowFunctionLocalVariableInFile()`.
+
+Nested callable parameter and local variable renames include closure and arrow-function containers inside methods, functions, and files. Container resolution, zero-based DFS callable selection, scoped variable mutation, capture updates, supported docblock updates, import rewrites, and graph refresh are provided by `php-rename`; the adapter maps the global transaction context into `RenameStepContext` and maps the result back.
 
 `php-refactor` does not call `PhpRenameTransaction`. That transaction belongs to standalone `php-rename` usage only.
 

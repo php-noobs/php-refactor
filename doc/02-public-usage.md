@@ -76,6 +76,32 @@ Method containers are identified by class FQCN and method name. Function contain
 
 Parameter methods accept the target parameter name and an optional zero-based parameter index. Return methods target the selected closure or arrow function return type. Native type nodes and PHPDoc type strings follow the same rules as top-level method and function type changes.
 
+## Nested Callable Renames
+
+`php-refactor` exposes closure and arrow-function parameter renames inside method, function, and file containers:
+
+- `renameNestedCallableParameter()`;
+- `renameClosureParameterInMethod()`;
+- `renameArrowFunctionParameterInMethod()`;
+- `renameClosureParameterInFunction()`;
+- `renameArrowFunctionParameterInFunction()`;
+- `renameClosureParameterInFile()`;
+- `renameArrowFunctionParameterInFile()`.
+
+It also exposes closure and arrow-function local variable renames inside the same containers:
+
+- `renameNestedCallableLocalVariable()`;
+- `renameClosureLocalVariableInMethod()`;
+- `renameArrowFunctionLocalVariableInMethod()`;
+- `renameClosureLocalVariableInFunction()`;
+- `renameArrowFunctionLocalVariableInFunction()`;
+- `renameClosureLocalVariableInFile()`;
+- `renameArrowFunctionLocalVariableInFile()`.
+
+Method containers are identified by class FQCN and method name. Function containers are identified by function FQCN. File containers are identified by file path. The selected closure or arrow function uses the same zero-based DFS index model as nested callable type changes.
+
+`php-rename` handles scoped mutation, closure captures, arrow-function captures, supported `@param` docblocks for parameter renames, local variable conflict checks, import rewrites for FQCN renames, and graph refresh after each applied step.
+
 ## Transaction Rules
 
 Transactions:

@@ -8,6 +8,9 @@ use PhpNoobs\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
 use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionContext;
 use PhpNoobs\PhpRename\Application\PhpRename;
 use PhpNoobs\PhpRename\Domain\Rename\Conflict\RenameConflictPolicy;
+use PhpNoobs\PhpRename\Domain\Rename\Plan\RenamePlan;
+use PhpNoobs\PhpRename\Domain\Rename\Request\NestedCallableLocalVariableRenameRequest;
+use PhpNoobs\PhpRename\Domain\Rename\Request\NestedCallableRenameRequest;
 use PhpNoobs\PhpRename\Domain\Rename\Step\RenameStepContext;
 use PhpNoobs\PhpRename\Domain\Rename\Step\RenameStepResult;
 
@@ -28,6 +31,28 @@ final readonly class RenameServiceAdapter
         private PhpRename $renamer,
         private RenameDiagnosticMapper $diagnosticMapper = new RenameDiagnosticMapper(),
     ) {
+    }
+
+    /**
+     * Executes one preplanned rename step.
+     *
+     * @param RefactorTransactionContext $context the current refactor context
+     * @param RenamePlan                 $plan    the rename plan to execute
+     */
+    public function executeStep(RefactorTransactionContext $context, RenamePlan $plan): RefactorTransactionContext
+    {
+        return $this->execute(
+            context: $context,
+            operation: 'executeStep',
+            arguments: [
+                'plan' => $plan::class,
+                'request' => $plan->request::class,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStep(
+                plan: $plan,
+                context: $renameContext,
+            ),
+        );
     }
 
     /**
@@ -421,6 +446,554 @@ final readonly class RenameServiceAdapter
                 parameterName: $parameterName,
                 newParameterName: $newParameterName,
                 parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one nested callable parameter rename step.
+     *
+     * @param RefactorTransactionContext  $context the current refactor context
+     * @param NestedCallableRenameRequest $request the nested callable parameter rename request
+     */
+    public function renameNestedCallableParameter(
+        RefactorTransactionContext $context,
+        NestedCallableRenameRequest $request,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameNestedCallableParameter',
+            arguments: [
+                'request' => $request::class,
+                'callableIndex' => $request->callableIndex,
+                'parameterName' => $request->parameterName,
+                'newName' => $request->newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepNestedCallableParameterRename(
+                context: $renameContext,
+                request: $request,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure parameter rename step inside a method.
+     *
+     * @param RefactorTransactionContext $context          the current refactor context
+     * @param string                     $className        the method owner FQCN
+     * @param string                     $methodName       the method name
+     * @param int                        $closureIndex     the zero-based closure index
+     * @param string                     $parameterName    the current parameter name without "$"
+     * @param string                     $newParameterName the replacement parameter name without "$"
+     * @param int|null                   $parameterIndex   the optional zero-based parameter index
+     * @param RenameConflictPolicy       $conflictPolicy   the rename conflict policy
+     */
+    public function renameClosureParameterInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $closureIndex,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameClosureParameterInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'closureIndex' => $closureIndex,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepClosureParameterRenameInMethod(
+                context: $renameContext,
+                className: $className,
+                methodName: $methodName,
+                closureIndex: $closureIndex,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow-function parameter rename step inside a method.
+     *
+     * @param RefactorTransactionContext $context          the current refactor context
+     * @param string                     $className        the method owner FQCN
+     * @param string                     $methodName       the method name
+     * @param int                        $arrowIndex       the zero-based arrow-function index
+     * @param string                     $parameterName    the current parameter name without "$"
+     * @param string                     $newParameterName the replacement parameter name without "$"
+     * @param int|null                   $parameterIndex   the optional zero-based parameter index
+     * @param RenameConflictPolicy       $conflictPolicy   the rename conflict policy
+     */
+    public function renameArrowFunctionParameterInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $arrowIndex,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameArrowFunctionParameterInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'arrowIndex' => $arrowIndex,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepArrowFunctionParameterRenameInMethod(
+                context: $renameContext,
+                className: $className,
+                methodName: $methodName,
+                arrowIndex: $arrowIndex,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure parameter rename step inside a function.
+     *
+     * @param RefactorTransactionContext $context          the current refactor context
+     * @param string                     $functionName     the function FQCN
+     * @param int                        $closureIndex     the zero-based closure index
+     * @param string                     $parameterName    the current parameter name without "$"
+     * @param string                     $newParameterName the replacement parameter name without "$"
+     * @param int|null                   $parameterIndex   the optional zero-based parameter index
+     * @param RenameConflictPolicy       $conflictPolicy   the rename conflict policy
+     */
+    public function renameClosureParameterInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $closureIndex,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameClosureParameterInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'closureIndex' => $closureIndex,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepClosureParameterRenameInFunction(
+                context: $renameContext,
+                functionName: $functionName,
+                closureIndex: $closureIndex,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow-function parameter rename step inside a function.
+     *
+     * @param RefactorTransactionContext $context          the current refactor context
+     * @param string                     $functionName     the function FQCN
+     * @param int                        $arrowIndex       the zero-based arrow-function index
+     * @param string                     $parameterName    the current parameter name without "$"
+     * @param string                     $newParameterName the replacement parameter name without "$"
+     * @param int|null                   $parameterIndex   the optional zero-based parameter index
+     * @param RenameConflictPolicy       $conflictPolicy   the rename conflict policy
+     */
+    public function renameArrowFunctionParameterInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $arrowIndex,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameArrowFunctionParameterInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'arrowIndex' => $arrowIndex,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepArrowFunctionParameterRenameInFunction(
+                context: $renameContext,
+                functionName: $functionName,
+                arrowIndex: $arrowIndex,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure parameter rename step inside a file.
+     *
+     * @param RefactorTransactionContext $context          the current refactor context
+     * @param string                     $filePath         the physical or virtual file path
+     * @param int                        $closureIndex     the zero-based closure index
+     * @param string                     $parameterName    the current parameter name without "$"
+     * @param string                     $newParameterName the replacement parameter name without "$"
+     * @param int|null                   $parameterIndex   the optional zero-based parameter index
+     * @param RenameConflictPolicy       $conflictPolicy   the rename conflict policy
+     */
+    public function renameClosureParameterInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $closureIndex,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameClosureParameterInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'closureIndex' => $closureIndex,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepClosureParameterRenameInFile(
+                context: $renameContext,
+                filePath: $filePath,
+                closureIndex: $closureIndex,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow-function parameter rename step inside a file.
+     *
+     * @param RefactorTransactionContext $context          the current refactor context
+     * @param string                     $filePath         the physical or virtual file path
+     * @param int                        $arrowIndex       the zero-based arrow-function index
+     * @param string                     $parameterName    the current parameter name without "$"
+     * @param string                     $newParameterName the replacement parameter name without "$"
+     * @param int|null                   $parameterIndex   the optional zero-based parameter index
+     * @param RenameConflictPolicy       $conflictPolicy   the rename conflict policy
+     */
+    public function renameArrowFunctionParameterInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $arrowIndex,
+        string $parameterName,
+        string $newParameterName,
+        ?int $parameterIndex = null,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameArrowFunctionParameterInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'arrowIndex' => $arrowIndex,
+                'parameterName' => $parameterName,
+                'newParameterName' => $newParameterName,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepArrowFunctionParameterRenameInFile(
+                context: $renameContext,
+                filePath: $filePath,
+                arrowIndex: $arrowIndex,
+                parameterName: $parameterName,
+                newParameterName: $newParameterName,
+                parameterIndex: $parameterIndex,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one nested callable local variable rename step.
+     *
+     * @param RefactorTransactionContext               $context the current refactor context
+     * @param NestedCallableLocalVariableRenameRequest $request the nested callable local variable rename request
+     */
+    public function renameNestedCallableLocalVariable(
+        RefactorTransactionContext $context,
+        NestedCallableLocalVariableRenameRequest $request,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameNestedCallableLocalVariable',
+            arguments: [
+                'request' => $request::class,
+                'callableIndex' => $request->callableIndex,
+                'variableName' => $request->variableName,
+                'newName' => $request->newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepNestedCallableLocalVariableRename(
+                context: $renameContext,
+                request: $request,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure local variable rename step inside a method.
+     *
+     * @param RefactorTransactionContext $context        the current refactor context
+     * @param string                     $className      the method owner FQCN
+     * @param string                     $methodName     the method name
+     * @param int                        $closureIndex   the zero-based closure index
+     * @param string                     $variableName   the current variable name without "$"
+     * @param string                     $newName        the replacement variable name without "$"
+     * @param RenameConflictPolicy       $conflictPolicy the rename conflict policy
+     */
+    public function renameClosureLocalVariableInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $closureIndex,
+        string $variableName,
+        string $newName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameClosureLocalVariableInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'closureIndex' => $closureIndex,
+                'variableName' => $variableName,
+                'newName' => $newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepClosureLocalVariableRenameInMethod(
+                context: $renameContext,
+                className: $className,
+                methodName: $methodName,
+                closureIndex: $closureIndex,
+                variableName: $variableName,
+                newName: $newName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow-function local variable rename step inside a method.
+     *
+     * @param RefactorTransactionContext $context        the current refactor context
+     * @param string                     $className      the method owner FQCN
+     * @param string                     $methodName     the method name
+     * @param int                        $arrowIndex     the zero-based arrow-function index
+     * @param string                     $variableName   the current variable name without "$"
+     * @param string                     $newName        the replacement variable name without "$"
+     * @param RenameConflictPolicy       $conflictPolicy the rename conflict policy
+     */
+    public function renameArrowFunctionLocalVariableInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $arrowIndex,
+        string $variableName,
+        string $newName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameArrowFunctionLocalVariableInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'arrowIndex' => $arrowIndex,
+                'variableName' => $variableName,
+                'newName' => $newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepArrowFunctionLocalVariableRenameInMethod(
+                context: $renameContext,
+                className: $className,
+                methodName: $methodName,
+                arrowIndex: $arrowIndex,
+                variableName: $variableName,
+                newName: $newName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure local variable rename step inside a function.
+     *
+     * @param RefactorTransactionContext $context        the current refactor context
+     * @param string                     $functionName   the function FQCN
+     * @param int                        $closureIndex   the zero-based closure index
+     * @param string                     $variableName   the current variable name without "$"
+     * @param string                     $newName        the replacement variable name without "$"
+     * @param RenameConflictPolicy       $conflictPolicy the rename conflict policy
+     */
+    public function renameClosureLocalVariableInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $closureIndex,
+        string $variableName,
+        string $newName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameClosureLocalVariableInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'closureIndex' => $closureIndex,
+                'variableName' => $variableName,
+                'newName' => $newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepClosureLocalVariableRenameInFunction(
+                context: $renameContext,
+                functionName: $functionName,
+                closureIndex: $closureIndex,
+                variableName: $variableName,
+                newName: $newName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow-function local variable rename step inside a function.
+     *
+     * @param RefactorTransactionContext $context        the current refactor context
+     * @param string                     $functionName   the function FQCN
+     * @param int                        $arrowIndex     the zero-based arrow-function index
+     * @param string                     $variableName   the current variable name without "$"
+     * @param string                     $newName        the replacement variable name without "$"
+     * @param RenameConflictPolicy       $conflictPolicy the rename conflict policy
+     */
+    public function renameArrowFunctionLocalVariableInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $arrowIndex,
+        string $variableName,
+        string $newName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameArrowFunctionLocalVariableInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'arrowIndex' => $arrowIndex,
+                'variableName' => $variableName,
+                'newName' => $newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepArrowFunctionLocalVariableRenameInFunction(
+                context: $renameContext,
+                functionName: $functionName,
+                arrowIndex: $arrowIndex,
+                variableName: $variableName,
+                newName: $newName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure local variable rename step inside a file.
+     *
+     * @param RefactorTransactionContext $context        the current refactor context
+     * @param string                     $filePath       the physical or virtual file path
+     * @param int                        $closureIndex   the zero-based closure index
+     * @param string                     $variableName   the current variable name without "$"
+     * @param string                     $newName        the replacement variable name without "$"
+     * @param RenameConflictPolicy       $conflictPolicy the rename conflict policy
+     */
+    public function renameClosureLocalVariableInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $closureIndex,
+        string $variableName,
+        string $newName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameClosureLocalVariableInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'closureIndex' => $closureIndex,
+                'variableName' => $variableName,
+                'newName' => $newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepClosureLocalVariableRenameInFile(
+                context: $renameContext,
+                filePath: $filePath,
+                closureIndex: $closureIndex,
+                variableName: $variableName,
+                newName: $newName,
+                conflictPolicy: $conflictPolicy,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow-function local variable rename step inside a file.
+     *
+     * @param RefactorTransactionContext $context        the current refactor context
+     * @param string                     $filePath       the physical or virtual file path
+     * @param int                        $arrowIndex     the zero-based arrow-function index
+     * @param string                     $variableName   the current variable name without "$"
+     * @param string                     $newName        the replacement variable name without "$"
+     * @param RenameConflictPolicy       $conflictPolicy the rename conflict policy
+     */
+    public function renameArrowFunctionLocalVariableInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $arrowIndex,
+        string $variableName,
+        string $newName,
+        RenameConflictPolicy $conflictPolicy = RenameConflictPolicy::FAIL,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'renameArrowFunctionLocalVariableInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'arrowIndex' => $arrowIndex,
+                'variableName' => $variableName,
+                'newName' => $newName,
+            ],
+            callback: fn (RenameStepContext $renameContext): RenameStepResult => $this->renamer->executeStepArrowFunctionLocalVariableRenameInFile(
+                context: $renameContext,
+                filePath: $filePath,
+                arrowIndex: $arrowIndex,
+                variableName: $variableName,
+                newName: $newName,
                 conflictPolicy: $conflictPolicy,
             ),
         );

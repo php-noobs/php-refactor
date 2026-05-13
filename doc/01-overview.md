@@ -6,7 +6,7 @@ Navigation: [Documentation](README.md) | [Previous: Documentation](README.md) | 
 
 Its responsibility is to compose safe operations in a coherent order:
 
-- rename symbols through `php-rename`;
+- rename symbols, nested callable parameters, and nested callable local variables through `php-rename`;
 - change native and PHPDoc types through `php-retype`;
 - delegate property and class constant declaration splitting to `php-retype`;
 - delegate promoted property, enum backing type, and nested callable handling to `php-retype`;
@@ -44,6 +44,7 @@ The implementation:
 - snapshots all loaded virtual files at `beginTransaction()`;
 - delegates rename operations to `php-rename` step APIs;
 - delegates type-change operations to `php-retype` step APIs;
+- exposes closure and arrow-function parameter and local variable renames inside method, function, and file containers;
 - exposes closure and arrow-function type changes inside method, function, and file containers;
 - aggregates diagnostics and action journal entries;
 - rolls back globally on blocking diagnostics or unexpected exceptions;

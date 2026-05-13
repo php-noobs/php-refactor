@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace PhpNoobs\PhpRefactor\Tests\Contract;
 
+use PhpNoobs\PhpRefactor\Application\Adapter\RenameServiceAdapter;
 use PhpNoobs\PhpRefactor\Application\PhpRefactor;
 use PhpNoobs\PhpRefactor\Application\PhpRefactorTransaction;
 use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
+use PhpNoobs\PhpRename\Application\PhpRename;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,6 +42,24 @@ final class PhpRefactorPublicApiContractTest extends TestCase
             self::assertTrue($transaction->hasMethod($methodName), sprintf('Missing method %s.', $methodName));
             self::assertTrue($transaction->getMethod($methodName)->isPublic(), sprintf('Method %s is not public.', $methodName));
         }
+    }
+
+    /**
+     * Ensures every public php-rename step API has a mapped adapter operation.
+     */
+    public function testRenameAdapterCoversEveryPhpRenameStepApi(): void
+    {
+        $renamer = new \ReflectionClass(PhpRename::class);
+        $adapter = new \ReflectionClass(RenameServiceAdapter::class);
+
+        foreach ($this->renameStepAdapterMap() as $stepMethodName => $adapterMethodName) {
+            self::assertTrue($renamer->hasMethod($stepMethodName), sprintf('Missing php-rename step method %s.', $stepMethodName));
+            self::assertTrue($renamer->getMethod($stepMethodName)->isPublic(), sprintf('php-rename step method %s is not public.', $stepMethodName));
+            self::assertTrue($adapter->hasMethod($adapterMethodName), sprintf('Missing adapter method %s for %s.', $adapterMethodName, $stepMethodName));
+            self::assertTrue($adapter->getMethod($adapterMethodName)->isPublic(), sprintf('Adapter method %s is not public.', $adapterMethodName));
+        }
+
+        self::assertSame(array_keys($this->renameStepAdapterMap()), $this->publicRenameStepMethods($renamer));
     }
 
     /**
@@ -78,6 +98,7 @@ final class PhpRefactorPublicApiContractTest extends TestCase
     private function renameMethods(): array
     {
         return [
+            'executeRenamePlan',
             'renameClass',
             'renameClassFqcn',
             'renameMethod',
@@ -90,7 +111,81 @@ final class PhpRefactorPublicApiContractTest extends TestCase
             'renameConstantFqcn',
             'renameMethodParameter',
             'renameFunctionParameter',
+            'renameNestedCallableParameter',
+            'renameClosureParameterInMethod',
+            'renameArrowFunctionParameterInMethod',
+            'renameClosureParameterInFunction',
+            'renameArrowFunctionParameterInFunction',
+            'renameClosureParameterInFile',
+            'renameArrowFunctionParameterInFile',
+            'renameNestedCallableLocalVariable',
+            'renameClosureLocalVariableInMethod',
+            'renameArrowFunctionLocalVariableInMethod',
+            'renameClosureLocalVariableInFunction',
+            'renameArrowFunctionLocalVariableInFunction',
+            'renameClosureLocalVariableInFile',
+            'renameArrowFunctionLocalVariableInFile',
         ];
+    }
+
+    /**
+     * Returns the expected mapping between php-rename step methods and adapter methods.
+     *
+     * @return array<string, string>
+     */
+    private function renameStepAdapterMap(): array
+    {
+        return [
+            'executeStep' => 'executeStep',
+            'executeStepMethodRename' => 'renameMethod',
+            'executeStepPropertyRename' => 'renameProperty',
+            'executeStepClassConstantRename' => 'renameClassConstant',
+            'executeStepEnumCaseRename' => 'renameEnumCase',
+            'executeStepClassRename' => 'renameClass',
+            'executeStepClassFqcnRename' => 'renameClassFqcn',
+            'executeStepFunctionRename' => 'renameFunction',
+            'executeStepFunctionFqcnRename' => 'renameFunctionFqcn',
+            'executeStepConstantRename' => 'renameConstant',
+            'executeStepConstantFqcnRename' => 'renameConstantFqcn',
+            'executeStepMethodParameterRename' => 'renameMethodParameter',
+            'executeStepFunctionParameterRename' => 'renameFunctionParameter',
+            'executeStepNestedCallableLocalVariableRename' => 'renameNestedCallableLocalVariable',
+            'executeStepClosureLocalVariableRenameInMethod' => 'renameClosureLocalVariableInMethod',
+            'executeStepArrowFunctionLocalVariableRenameInMethod' => 'renameArrowFunctionLocalVariableInMethod',
+            'executeStepClosureLocalVariableRenameInFunction' => 'renameClosureLocalVariableInFunction',
+            'executeStepArrowFunctionLocalVariableRenameInFunction' => 'renameArrowFunctionLocalVariableInFunction',
+            'executeStepClosureLocalVariableRenameInFile' => 'renameClosureLocalVariableInFile',
+            'executeStepArrowFunctionLocalVariableRenameInFile' => 'renameArrowFunctionLocalVariableInFile',
+            'executeStepNestedCallableParameterRename' => 'renameNestedCallableParameter',
+            'executeStepClosureParameterRenameInMethod' => 'renameClosureParameterInMethod',
+            'executeStepArrowFunctionParameterRenameInMethod' => 'renameArrowFunctionParameterInMethod',
+            'executeStepClosureParameterRenameInFunction' => 'renameClosureParameterInFunction',
+            'executeStepArrowFunctionParameterRenameInFunction' => 'renameArrowFunctionParameterInFunction',
+            'executeStepClosureParameterRenameInFile' => 'renameClosureParameterInFile',
+            'executeStepArrowFunctionParameterRenameInFile' => 'renameArrowFunctionParameterInFile',
+        ];
+    }
+
+    /**
+     * Returns public php-rename step methods in reflection order.
+     *
+     * @param \ReflectionClass<PhpRename> $renamer the php-rename reflection class
+     *
+     * @return list<string>
+     */
+    private function publicRenameStepMethods(\ReflectionClass $renamer): array
+    {
+        $methodNames = [];
+
+        foreach ($renamer->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            if (0 !== strncmp($method->getName(), 'executeStep', strlen('executeStep'))) {
+                continue;
+            }
+
+            $methodNames[] = $method->getName();
+        }
+
+        return $methodNames;
     }
 
     /**

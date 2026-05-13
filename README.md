@@ -76,6 +76,20 @@ if (false === $result->isSuccessful()) {
 - `renameConstantFqcn()`
 - `renameMethodParameter()`
 - `renameFunctionParameter()`
+- `renameNestedCallableParameter()`
+- `renameClosureParameterInMethod()`
+- `renameArrowFunctionParameterInMethod()`
+- `renameClosureParameterInFunction()`
+- `renameArrowFunctionParameterInFunction()`
+- `renameClosureParameterInFile()`
+- `renameArrowFunctionParameterInFile()`
+- `renameNestedCallableLocalVariable()`
+- `renameClosureLocalVariableInMethod()`
+- `renameArrowFunctionLocalVariableInMethod()`
+- `renameClosureLocalVariableInFunction()`
+- `renameArrowFunctionLocalVariableInFunction()`
+- `renameClosureLocalVariableInFile()`
+- `renameArrowFunctionLocalVariableInFile()`
 
 ## Supported Type-Change Operations
 
@@ -104,6 +118,8 @@ if (false === $result->isSuccessful()) {
 Property and class constant type changes support grouped declaration splitting through `php-retype`. Property type changes also support promoted properties and direct `@var` updates. Enum backing type changes support `int` and `string`.
 
 Nested callable type changes target closures or arrow functions inside a method, function, or file container. The callable is selected by its zero-based DFS index inside that container. `php-retype` resolves the container, mutates the native type, updates directly attached PHPDoc when available, and refreshes the graph for the next transaction step.
+
+Nested callable renames target closure or arrow-function parameters and local variables inside a method, function, or file container. `php-rename` handles deterministic callable selection, scoped variable mutation, closure captures, arrow-function captures, supported docblocks, import rewrites, and graph refresh.
 
 ## Documentation
 
