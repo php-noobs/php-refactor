@@ -614,6 +614,62 @@ final class PhpRefactorTransaction
     }
 
     /**
+     * Delegates one class constant type change to php-retype.
+     *
+     * @param string                                                       $className    the class-like owner FQCN
+     * @param string                                                       $constantName the class constant name
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode     the native PHP type node to write
+     * @param string|null                                                  $docType      the PHPDoc type to write in the `@var` tag
+     */
+    public function changeClassConstantType(
+        string $className,
+        string $constantName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): self {
+        return $this->executeStep(
+            service: RetypeServiceAdapter::SERVICE,
+            operation: 'changeClassConstantType',
+            arguments: [
+                'className' => $className,
+                'constantName' => $constantName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->retypeServiceAdapter->changeClassConstantType(
+                context: $context,
+                className: $className,
+                constantName: $constantName,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Delegates one enum backing type change to php-retype.
+     *
+     * @param string     $enumName the enum FQCN
+     * @param Identifier $typeNode the native PHP backing type node to write
+     */
+    public function changeEnumBackingType(string $enumName, Identifier $typeNode): self
+    {
+        return $this->executeStep(
+            service: RetypeServiceAdapter::SERVICE,
+            operation: 'changeEnumBackingType',
+            arguments: [
+                'enumName' => $enumName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+            ],
+            callback: fn (RefactorTransactionContext $context): RefactorTransactionContext => $this->retypeServiceAdapter->changeEnumBackingType(
+                context: $context,
+                enumName: $enumName,
+                typeNode: $typeNode,
+            ),
+        );
+    }
+
+    /**
      * Commits the global transaction in memory.
      */
     public function commit(): RefactorTransactionResult

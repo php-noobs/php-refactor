@@ -4,7 +4,7 @@ Navigation: [Next: Overview](01-overview.md)
 
 This documentation describes the `PhpRefactor` component, its orchestration role, and its boundaries with specialized refactoring services.
 
-`PhpRefactor` is the high-level orchestration package for composed PHP refactoring workflows. It orchestrates `php-rename` and `php-retype` operations in one global transaction without duplicating semantic resolution, AST mutation, property declaration splitting, or source-writing responsibilities.
+`PhpRefactor` is the high-level orchestration package for composed PHP refactoring workflows. It orchestrates `php-rename` and `php-retype` operations in one global transaction without duplicating semantic resolution, AST mutation, declaration splitting, enum backing type validation, or source-writing responsibilities.
 
 ## Pages
 

@@ -84,10 +84,12 @@ if (false === $result->isSuccessful()) {
 - `changeMethodReturnType()`
 - `changeFunctionReturnType()`
 - `changePropertyType()`
+- `changeClassConstantType()`
+- `changeEnumBackingType()`
 
 `PhpRefactor` owns the cross-service transaction. It calls service step APIs and never nests `PhpRenameTransaction` or `PhpRetypeTransaction`.
 
-Property type changes support single properties, grouped property declarations, grouped declaration splitting, promoted properties, and direct `@var` updates through `php-retype`.
+Property and class constant type changes support grouped declaration splitting through `php-retype`. Property type changes also support promoted properties and direct `@var` updates. Enum backing type changes support `int` and `string`.
 
 ## Documentation
 

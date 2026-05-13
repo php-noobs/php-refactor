@@ -204,6 +204,108 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
     }
 
     /**
+     * Ensures a global transaction can change a class constant type in memory.
+     */
+    public function testItCommitsClassConstantTypeChangeInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeConfigFile($srcDirectory.'/Config.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changeClassConstantType('App\\Config', 'DEFAULT_PORT', new Identifier('int'), 'int')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('@var int', $printedCode);
+        self::assertStringContainsString('public const int DEFAULT_PORT = 25;', $printedCode);
+    }
+
+    /**
+     * Ensures a partial grouped class constant declaration can be split through the global transaction.
+     */
+    public function testItReflectsGroupedClassConstantPartialRetypeInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeGroupedConfigFile($srcDirectory.'/Config.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changeClassConstantType('App\\Config', 'DEFAULT_PORT', new Identifier('int'), 'int')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('@var int', $printedCode);
+        self::assertStringContainsString('public const int DEFAULT_PORT = 25;', $printedCode);
+        self::assertStringContainsString('public const string FALLBACK_PORT = \'587\';', $printedCode);
+    }
+
+    /**
+     * Ensures a global transaction can change an enum backing type in memory.
+     */
+    public function testItCommitsEnumBackingTypeChangeInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeStatusEnumFile($srcDirectory.'/Status.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changeEnumBackingType('App\\Status', new Identifier('int'))
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('enum Status : int', $printedCode);
+        self::assertStringNotContainsString('enum Status : string', $printedCode);
+    }
+
+    /**
+     * Ensures php-retype consumes the graph updated by a previous class constant rename step.
+     */
+    public function testItUsesUpdatedGraphBetweenClassConstantRenameAndRetypeSteps(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeConfigFile($srcDirectory.'/Config.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameClassConstant('App\\Config', 'DEFAULT_PORT', 'SMTP_PORT')
+            ->changeClassConstantType('App\\Config', 'SMTP_PORT', new Identifier('int'), 'int')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('public const int SMTP_PORT = 25;', $printedCode);
+        self::assertStringNotContainsString('DEFAULT_PORT', $printedCode);
+    }
+
+    /**
      * Ensures php-retype consumes the graph updated by a previous php-rename step.
      */
     public function testItUsesUpdatedGraphBetweenRenameAndRetypeSteps(): void
@@ -301,6 +403,35 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
         self::assertFalse($result->isSuccessful());
         self::assertStringContainsString('private string $transport;', $printedCode);
         self::assertStringNotContainsString('$primaryTransport', $printedCode);
+    }
+
+    /**
+     * Ensures a failing workflow with enum backing retype restores the begin-transaction virtual files.
+     */
+    public function testItRollsBackVirtualFilesAfterFailingEnumBackingRetypeWorkflow(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeConfigFile($srcDirectory.'/Config.php');
+        $this->writeStatusEnumFile($srcDirectory.'/Status.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameClassConstant('App\\Config', 'DEFAULT_PORT', 'SMTP_PORT')
+            ->changeEnumBackingType('App\\Status', new Identifier('bool'))
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::ROLLED_BACK, $result->status);
+        self::assertFalse($result->isSuccessful());
+        self::assertTrue($result->diagnostics->hasErrors());
+        self::assertStringContainsString('public const string DEFAULT_PORT = 25;', $printedCode);
+        self::assertStringNotContainsString('SMTP_PORT', $printedCode);
+        self::assertStringContainsString('enum Status : string', $printedCode);
     }
 
     /**
@@ -468,6 +599,69 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
 
             final class Transport
             {
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the config fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeConfigFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Config
+            {
+                /**
+                 * @var string
+                 */
+                public const string DEFAULT_PORT = 25;
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the grouped config fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeGroupedConfigFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Config
+            {
+                /**
+                 * @var string
+                 */
+                public const string DEFAULT_PORT = 25, FALLBACK_PORT = '587';
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the status enum fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeStatusEnumFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            enum Status: string
+            {
+                case Active = '1';
             }
             PHP);
     }

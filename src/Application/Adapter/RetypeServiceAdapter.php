@@ -218,6 +218,68 @@ final readonly class RetypeServiceAdapter
     }
 
     /**
+     * Executes one class constant type-change step.
+     *
+     * @param RefactorTransactionContext                                   $context      the current refactor context
+     * @param string                                                       $className    the class-like owner FQCN
+     * @param string                                                       $constantName the class constant name
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode     the native PHP type node to write
+     * @param string|null                                                  $docType      the PHPDoc type to write in the `@var` tag
+     */
+    public function changeClassConstantType(
+        RefactorTransactionContext $context,
+        string $className,
+        string $constantName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeClassConstantType',
+            arguments: [
+                'className' => $className,
+                'constantName' => $constantName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepClassConstantTypeChange(
+                context: $retypeContext,
+                className: $className,
+                constantName: $constantName,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Executes one enum backing type-change step.
+     *
+     * @param RefactorTransactionContext $context  the current refactor context
+     * @param string                     $enumName the enum FQCN
+     * @param Identifier                 $typeNode the native PHP backing type node to write
+     */
+    public function changeEnumBackingType(
+        RefactorTransactionContext $context,
+        string $enumName,
+        Identifier $typeNode,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeEnumBackingType',
+            arguments: [
+                'enumName' => $enumName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepEnumBackingTypeChange(
+                context: $retypeContext,
+                enumName: $enumName,
+                typeNode: $typeNode,
+            ),
+        );
+    }
+
+    /**
      * Executes a retype step and maps it back into the global context.
      *
      * @param RefactorTransactionContext                    $context   the current refactor context

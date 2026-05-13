@@ -43,11 +43,17 @@ The same build and source registry are shared across rename and retype steps.
 - `changeFunctionParameterType()`;
 - `changeMethodReturnType()`;
 - `changeFunctionReturnType()`;
-- `changePropertyType()`.
+- `changePropertyType()`;
+- `changeClassConstantType()`;
+- `changeEnumBackingType()`.
 
 Each method accepts a PHP-Parser type node for the native type and an optional PHPDoc type string. A `null` native type removes the native declaration while preserving the PHPDoc change when a doc type is provided.
 
 `changePropertyType()` accepts one property name or a list of property names. Grouped property declaration splitting, promoted property mutation, and direct `@var` updates are handled by `php-retype`.
+
+`changeClassConstantType()` changes class constant native types and direct `@var` tags. Grouped class constant declaration splitting is handled by `php-retype`.
+
+`changeEnumBackingType()` changes enum backing types and accepts `int` or `string` identifiers.
 
 ## Transaction Rules
 
