@@ -205,12 +205,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-noobs/php-retype.git",
-                "reference": "1a691deca559f0d0a3ac5352f9e51d9a0a36f688"
+                "reference": "d0b367885aef95f607be2530469a5f277770dedb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-noobs/php-retype/zipball/1a691deca559f0d0a3ac5352f9e51d9a0a36f688",
-                "reference": "1a691deca559f0d0a3ac5352f9e51d9a0a36f688",
+                "url": "https://api.github.com/repos/php-noobs/php-retype/zipball/d0b367885aef95f607be2530469a5f277770dedb",
+                "reference": "d0b367885aef95f607be2530469a5f277770dedb",
                 "shasum": ""
             },
             "require": {
@@ -264,7 +264,7 @@
                 "source": "https://github.com/php-noobs/php-retype/tree/main",
                 "issues": "https://github.com/php-noobs/php-retype/issues"
             },
-            "time": "2026-05-13T11:42:45+00:00"
+            "time": "2026-05-13T12:24:20+00:00"
         },
         {
             "name": "php-noobs/php-source-registry",

@@ -280,6 +280,490 @@ final readonly class RetypeServiceAdapter
     }
 
     /**
+     * Executes one closure parameter type-change step inside a method.
+     *
+     * @param RefactorTransactionContext                                   $context        the current refactor context
+     * @param string                                                       $className      the method owner FQCN
+     * @param string                                                       $methodName     the method name
+     * @param int                                                          $closureIndex   the zero-based closure index
+     * @param string                                                       $parameterName  the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode       the native PHP type node to write
+     * @param string|null                                                  $docType        the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex the optional zero-based parameter index
+     */
+    public function changeClosureParameterTypeInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $closureIndex,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeClosureParameterTypeInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'closureIndex' => $closureIndex,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepClosureParameterTypeInMethod(
+                context: $retypeContext,
+                className: $className,
+                methodName: $methodName,
+                closureIndex: $closureIndex,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure return type-change step inside a method.
+     *
+     * @param RefactorTransactionContext                                   $context      the current refactor context
+     * @param string                                                       $className    the method owner FQCN
+     * @param string                                                       $methodName   the method name
+     * @param int                                                          $closureIndex the zero-based closure index
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode     the native PHP type node to write
+     * @param string|null                                                  $docType      the PHPDoc type to write in the `@return` tag
+     */
+    public function changeClosureReturnTypeInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $closureIndex,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeClosureReturnTypeInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'closureIndex' => $closureIndex,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepClosureReturnTypeInMethod(
+                context: $retypeContext,
+                className: $className,
+                methodName: $methodName,
+                closureIndex: $closureIndex,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow function parameter type-change step inside a method.
+     *
+     * @param RefactorTransactionContext                                   $context            the current refactor context
+     * @param string                                                       $className          the method owner FQCN
+     * @param string                                                       $methodName         the method name
+     * @param int                                                          $arrowFunctionIndex the zero-based arrow-function index
+     * @param string                                                       $parameterName      the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode           the native PHP type node to write
+     * @param string|null                                                  $docType            the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex     the optional zero-based parameter index
+     */
+    public function changeArrowFunctionParameterTypeInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $arrowFunctionIndex,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeArrowFunctionParameterTypeInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'arrowFunctionIndex' => $arrowFunctionIndex,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepArrowFunctionParameterTypeInMethod(
+                context: $retypeContext,
+                className: $className,
+                methodName: $methodName,
+                arrowFunctionIndex: $arrowFunctionIndex,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow function return type-change step inside a method.
+     *
+     * @param RefactorTransactionContext                                   $context            the current refactor context
+     * @param string                                                       $className          the method owner FQCN
+     * @param string                                                       $methodName         the method name
+     * @param int                                                          $arrowFunctionIndex the zero-based arrow-function index
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode           the native PHP type node to write
+     * @param string|null                                                  $docType            the PHPDoc type to write in the `@return` tag
+     */
+    public function changeArrowFunctionReturnTypeInMethod(
+        RefactorTransactionContext $context,
+        string $className,
+        string $methodName,
+        int $arrowFunctionIndex,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeArrowFunctionReturnTypeInMethod',
+            arguments: [
+                'className' => $className,
+                'methodName' => $methodName,
+                'arrowFunctionIndex' => $arrowFunctionIndex,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepArrowFunctionReturnTypeInMethod(
+                context: $retypeContext,
+                className: $className,
+                methodName: $methodName,
+                arrowFunctionIndex: $arrowFunctionIndex,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure parameter type-change step inside a function.
+     *
+     * @param RefactorTransactionContext                                   $context        the current refactor context
+     * @param string                                                       $functionName   the fully-qualified function name
+     * @param int                                                          $closureIndex   the zero-based closure index
+     * @param string                                                       $parameterName  the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode       the native PHP type node to write
+     * @param string|null                                                  $docType        the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex the optional zero-based parameter index
+     */
+    public function changeClosureParameterTypeInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $closureIndex,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeClosureParameterTypeInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'closureIndex' => $closureIndex,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepClosureParameterTypeInFunction(
+                context: $retypeContext,
+                functionName: $functionName,
+                closureIndex: $closureIndex,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure return type-change step inside a function.
+     *
+     * @param RefactorTransactionContext                                   $context      the current refactor context
+     * @param string                                                       $functionName the fully-qualified function name
+     * @param int                                                          $closureIndex the zero-based closure index
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode     the native PHP type node to write
+     * @param string|null                                                  $docType      the PHPDoc type to write in the `@return` tag
+     */
+    public function changeClosureReturnTypeInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $closureIndex,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeClosureReturnTypeInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'closureIndex' => $closureIndex,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepClosureReturnTypeInFunction(
+                context: $retypeContext,
+                functionName: $functionName,
+                closureIndex: $closureIndex,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow function parameter type-change step inside a function.
+     *
+     * @param RefactorTransactionContext                                   $context            the current refactor context
+     * @param string                                                       $functionName       the fully-qualified function name
+     * @param int                                                          $arrowFunctionIndex the zero-based arrow-function index
+     * @param string                                                       $parameterName      the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode           the native PHP type node to write
+     * @param string|null                                                  $docType            the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex     the optional zero-based parameter index
+     */
+    public function changeArrowFunctionParameterTypeInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $arrowFunctionIndex,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeArrowFunctionParameterTypeInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'arrowFunctionIndex' => $arrowFunctionIndex,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepArrowFunctionParameterTypeInFunction(
+                context: $retypeContext,
+                functionName: $functionName,
+                arrowFunctionIndex: $arrowFunctionIndex,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow function return type-change step inside a function.
+     *
+     * @param RefactorTransactionContext                                   $context            the current refactor context
+     * @param string                                                       $functionName       the fully-qualified function name
+     * @param int                                                          $arrowFunctionIndex the zero-based arrow-function index
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode           the native PHP type node to write
+     * @param string|null                                                  $docType            the PHPDoc type to write in the `@return` tag
+     */
+    public function changeArrowFunctionReturnTypeInFunction(
+        RefactorTransactionContext $context,
+        string $functionName,
+        int $arrowFunctionIndex,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeArrowFunctionReturnTypeInFunction',
+            arguments: [
+                'functionName' => $functionName,
+                'arrowFunctionIndex' => $arrowFunctionIndex,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepArrowFunctionReturnTypeInFunction(
+                context: $retypeContext,
+                functionName: $functionName,
+                arrowFunctionIndex: $arrowFunctionIndex,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure parameter type-change step inside a file.
+     *
+     * @param RefactorTransactionContext                                   $context        the current refactor context
+     * @param string                                                       $filePath       the physical or virtual file path
+     * @param int                                                          $closureIndex   the zero-based closure index
+     * @param string                                                       $parameterName  the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode       the native PHP type node to write
+     * @param string|null                                                  $docType        the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex the optional zero-based parameter index
+     */
+    public function changeClosureParameterTypeInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $closureIndex,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeClosureParameterTypeInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'closureIndex' => $closureIndex,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepClosureParameterTypeInFile(
+                context: $retypeContext,
+                filePath: $filePath,
+                closureIndex: $closureIndex,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Executes one closure return type-change step inside a file.
+     *
+     * @param RefactorTransactionContext                                   $context      the current refactor context
+     * @param string                                                       $filePath     the physical or virtual file path
+     * @param int                                                          $closureIndex the zero-based closure index
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode     the native PHP type node to write
+     * @param string|null                                                  $docType      the PHPDoc type to write in the `@return` tag
+     */
+    public function changeClosureReturnTypeInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $closureIndex,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeClosureReturnTypeInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'closureIndex' => $closureIndex,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepClosureReturnTypeInFile(
+                context: $retypeContext,
+                filePath: $filePath,
+                closureIndex: $closureIndex,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow function parameter type-change step inside a file.
+     *
+     * @param RefactorTransactionContext                                   $context            the current refactor context
+     * @param string                                                       $filePath           the physical or virtual file path
+     * @param int                                                          $arrowFunctionIndex the zero-based arrow-function index
+     * @param string                                                       $parameterName      the parameter name without "$"
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode           the native PHP type node to write
+     * @param string|null                                                  $docType            the PHPDoc type to write in the `@param` tag
+     * @param int|null                                                     $parameterIndex     the optional zero-based parameter index
+     */
+    public function changeArrowFunctionParameterTypeInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $arrowFunctionIndex,
+        string $parameterName,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+        ?int $parameterIndex = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeArrowFunctionParameterTypeInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'arrowFunctionIndex' => $arrowFunctionIndex,
+                'parameterName' => $parameterName,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+                'parameterIndex' => $parameterIndex,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepArrowFunctionParameterTypeInFile(
+                context: $retypeContext,
+                filePath: $filePath,
+                arrowFunctionIndex: $arrowFunctionIndex,
+                parameterName: $parameterName,
+                typeNode: $typeNode,
+                docType: $docType,
+                parameterIndex: $parameterIndex,
+            ),
+        );
+    }
+
+    /**
+     * Executes one arrow function return type-change step inside a file.
+     *
+     * @param RefactorTransactionContext                                   $context            the current refactor context
+     * @param string                                                       $filePath           the physical or virtual file path
+     * @param int                                                          $arrowFunctionIndex the zero-based arrow-function index
+     * @param Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode           the native PHP type node to write
+     * @param string|null                                                  $docType            the PHPDoc type to write in the `@return` tag
+     */
+    public function changeArrowFunctionReturnTypeInFile(
+        RefactorTransactionContext $context,
+        string $filePath,
+        int $arrowFunctionIndex,
+        Identifier|Name|NullableType|UnionType|IntersectionType|null $typeNode,
+        ?string $docType = null,
+    ): RefactorTransactionContext {
+        return $this->execute(
+            context: $context,
+            operation: 'changeArrowFunctionReturnTypeInFile',
+            arguments: [
+                'filePath' => $filePath,
+                'arrowFunctionIndex' => $arrowFunctionIndex,
+                'typeNode' => $this->typeNodeLabel($typeNode),
+                'docType' => $docType,
+            ],
+            callback: fn (RetypeStepContext $retypeContext): RetypeStepResult => $this->retype->executeStepArrowFunctionReturnTypeInFile(
+                context: $retypeContext,
+                filePath: $filePath,
+                arrowFunctionIndex: $arrowFunctionIndex,
+                typeNode: $typeNode,
+                docType: $docType,
+            ),
+        );
+    }
+
+    /**
      * Executes a retype step and maps it back into the global context.
      *
      * @param RefactorTransactionContext                    $context   the current refactor context

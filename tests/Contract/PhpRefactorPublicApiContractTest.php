@@ -108,6 +108,18 @@ final class PhpRefactorPublicApiContractTest extends TestCase
             'changePropertyType',
             'changeClassConstantType',
             'changeEnumBackingType',
+            'changeClosureParameterTypeInMethod',
+            'changeClosureReturnTypeInMethod',
+            'changeArrowFunctionParameterTypeInMethod',
+            'changeArrowFunctionReturnTypeInMethod',
+            'changeClosureParameterTypeInFunction',
+            'changeClosureReturnTypeInFunction',
+            'changeArrowFunctionParameterTypeInFunction',
+            'changeArrowFunctionReturnTypeInFunction',
+            'changeClosureParameterTypeInFile',
+            'changeClosureReturnTypeInFile',
+            'changeArrowFunctionParameterTypeInFile',
+            'changeArrowFunctionReturnTypeInFile',
         ];
     }
 }

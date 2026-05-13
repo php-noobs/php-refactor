@@ -9,7 +9,7 @@ Its responsibility is to compose safe operations in a coherent order:
 - rename symbols through `php-rename`;
 - change native and PHPDoc types through `php-retype`;
 - delegate property and class constant declaration splitting to `php-retype`;
-- delegate promoted property and enum backing type handling to `php-retype`;
+- delegate promoted property, enum backing type, and nested callable handling to `php-retype`;
 - keep graph state fresh between operations;
 - save source changes only through `php-source-registry`.
 
@@ -44,6 +44,7 @@ The implementation:
 - snapshots all loaded virtual files at `beginTransaction()`;
 - delegates rename operations to `php-rename` step APIs;
 - delegates type-change operations to `php-retype` step APIs;
+- exposes closure and arrow-function type changes inside method, function, and file containers;
 - aggregates diagnostics and action journal entries;
 - rolls back globally on blocking diagnostics or unexpected exceptions;
 - saves only through the final build source registry.

@@ -280,6 +280,85 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
     }
 
     /**
+     * Ensures a global transaction can change closure parameter and return types inside a method.
+     */
+    public function testItCommitsClosureParameterAndReturnTypeChangesInsideMethodInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeNestedMethodMailerFile($srcDirectory.'/Mailer.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changeClosureParameterTypeInMethod('App\\Mailer', 'send', 0, 'message', new Name('Message'), 'Message', 0)
+            ->changeClosureReturnTypeInMethod('App\\Mailer', 'send', 0, new Name('SendResult'), 'SendResult')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('function (Message $message): SendResult', $printedCode);
+    }
+
+    /**
+     * Ensures a global transaction can change arrow-function parameter and return types inside a function.
+     */
+    public function testItCommitsArrowFunctionParameterAndReturnTypeChangesInsideFunctionInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeNestedFunctionFile($srcDirectory.'/functions.php');
+        $this->writeMessageFile($srcDirectory.'/Message.php');
+        $this->writeSendResultFile($srcDirectory.'/SendResult.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changeArrowFunctionParameterTypeInFunction('App\\pipe', 0, 'message', new Name('Message'), 'Message', 0)
+            ->changeArrowFunctionReturnTypeInFunction('App\\pipe', 0, new Name('SendResult'), 'SendResult')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('fn(Message $message): SendResult =>', $printedCode);
+    }
+
+    /**
+     * Ensures a global transaction can change nested callable types inside a file container.
+     */
+    public function testItCommitsNestedCallableTypeChangesInsideFileInMemory(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $filePath = $srcDirectory.'/file-callables.php';
+        $this->writeFileLevelCallableFile($filePath);
+        $this->writeMessageFile($srcDirectory.'/Message.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->changeClosureParameterTypeInFile($filePath, 0, 'message', new Name('Message'), 'Message', 0)
+            ->changeClosureReturnTypeInFile($filePath, 0, new Identifier('int'), 'int')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('function (Message $message): int', $printedCode);
+    }
+
+    /**
      * Ensures php-retype consumes the graph updated by a previous class constant rename step.
      */
     public function testItUsesUpdatedGraphBetweenClassConstantRenameAndRetypeSteps(): void
@@ -328,6 +407,33 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
         self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
         self::assertTrue($result->isSuccessful());
         self::assertStringContainsString('function deliver(string $message): SendResult', $printedCode);
+        self::assertStringNotContainsString('function send(', $printedCode);
+    }
+
+    /**
+     * Ensures php-retype consumes nested callable containers updated by a previous php-rename step.
+     */
+    public function testItUsesUpdatedGraphBetweenRenameAndNestedCallableRetypeSteps(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeNestedMethodMailerFile($srcDirectory.'/Mailer.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameMethod('App\\Mailer', 'send', 'deliver')
+            ->changeClosureReturnTypeInMethod('App\\Mailer', 'deliver', 0, new Name('SendResult'), 'SendResult')
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::COMMITTED, $result->status);
+        self::assertTrue($result->isSuccessful());
+        self::assertStringContainsString('function deliver(): void', $printedCode);
+        self::assertStringContainsString('function (string $message): SendResult', $printedCode);
         self::assertStringNotContainsString('function send(', $printedCode);
     }
 
@@ -403,6 +509,33 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
         self::assertFalse($result->isSuccessful());
         self::assertStringContainsString('private string $transport;', $printedCode);
         self::assertStringNotContainsString('$primaryTransport', $printedCode);
+    }
+
+    /**
+     * Ensures a failing workflow with nested callable retype restores the begin-transaction virtual files.
+     */
+    public function testItRollsBackVirtualFilesAfterFailingNestedCallableRetypeWorkflow(): void
+    {
+        $srcDirectory = $this->workspace.'/src';
+        mkdir($srcDirectory, 0o777, true);
+        $this->writeNestedMethodMailerFile($srcDirectory.'/Mailer.php');
+
+        $result = PhpRefactor::fromDirectory(
+            directories: [$srcDirectory],
+            cacheFilePath: $this->workspace.'/member-graph.cache',
+        )
+            ->beginTransaction()
+            ->renameMethod('App\\Mailer', 'send', 'deliver')
+            ->changeClosureParameterTypeInMethod('App\\Mailer', 'deliver', 0, 'message', new NullableType(new Identifier('void')), '?void', 0)
+            ->commit();
+
+        $printedCode = $this->printedCode($result->finalBuild->virtualFiles);
+
+        self::assertSame(RefactorTransactionStatus::ROLLED_BACK, $result->status);
+        self::assertFalse($result->isSuccessful());
+        self::assertStringContainsString('function send(): void', $printedCode);
+        self::assertStringContainsString('function (string $message): string', $printedCode);
+        self::assertStringNotContainsString('function deliver(', $printedCode);
     }
 
     /**
@@ -513,6 +646,78 @@ final class PhpRefactorRetypeTransactionIntegrationTest extends TestCase
             {
                 return $message;
             }
+            PHP);
+    }
+
+    /**
+     * Writes the nested method mailer fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeNestedMethodMailerFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            final class Message
+            {
+            }
+
+            final class SendResult
+            {
+            }
+
+            final class Mailer
+            {
+                public function send(): void
+                {
+                    $formatter = function (string $message): string {
+                        return $message;
+                    };
+                    $formatter('hello');
+                }
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the nested function fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeNestedFunctionFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            function pipe(): void
+            {
+                $formatter = fn (string $message): string => $message;
+                $formatter('hello');
+            }
+            PHP);
+    }
+
+    /**
+     * Writes the file-level callable fixture.
+     *
+     * @param string $filePath the file path
+     */
+    private function writeFileLevelCallableFile(string $filePath): void
+    {
+        file_put_contents($filePath, <<<'PHP'
+            <?php
+
+            namespace App;
+
+            $formatter = function (string $message): string {
+                return $message;
+            };
+            $formatter('hello');
             PHP);
     }
 

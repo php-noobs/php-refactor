@@ -55,6 +55,27 @@ Each method accepts a PHP-Parser type node for the native type and an optional P
 
 `changeEnumBackingType()` changes enum backing types and accepts `int` or `string` identifiers.
 
+## Nested Callable Type Changes
+
+`php-refactor` exposes closure and arrow-function type changes inside method, function, and file containers:
+
+- `changeClosureParameterTypeInMethod()`;
+- `changeClosureReturnTypeInMethod()`;
+- `changeArrowFunctionParameterTypeInMethod()`;
+- `changeArrowFunctionReturnTypeInMethod()`;
+- `changeClosureParameterTypeInFunction()`;
+- `changeClosureReturnTypeInFunction()`;
+- `changeArrowFunctionParameterTypeInFunction()`;
+- `changeArrowFunctionReturnTypeInFunction()`;
+- `changeClosureParameterTypeInFile()`;
+- `changeClosureReturnTypeInFile()`;
+- `changeArrowFunctionParameterTypeInFile()`;
+- `changeArrowFunctionReturnTypeInFile()`.
+
+Method containers are identified by class FQCN and method name. Function containers are identified by function FQCN. File containers are identified by file path. The target closure or arrow function is selected by its zero-based DFS index inside the chosen container.
+
+Parameter methods accept the target parameter name and an optional zero-based parameter index. Return methods target the selected closure or arrow function return type. Native type nodes and PHPDoc type strings follow the same rules as top-level method and function type changes.
+
 ## Transaction Rules
 
 Transactions:

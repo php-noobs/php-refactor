@@ -51,11 +51,25 @@ The supported operations mirror the `php-retype` orchestrable step API:
 - `changeFunctionReturnType()`;
 - `changePropertyType()`;
 - `changeClassConstantType()`;
-- `changeEnumBackingType()`.
+- `changeEnumBackingType()`;
+- `changeClosureParameterTypeInMethod()`;
+- `changeClosureReturnTypeInMethod()`;
+- `changeArrowFunctionParameterTypeInMethod()`;
+- `changeArrowFunctionReturnTypeInMethod()`;
+- `changeClosureParameterTypeInFunction()`;
+- `changeClosureReturnTypeInFunction()`;
+- `changeArrowFunctionParameterTypeInFunction()`;
+- `changeArrowFunctionReturnTypeInFunction()`;
+- `changeClosureParameterTypeInFile()`;
+- `changeClosureReturnTypeInFile()`;
+- `changeArrowFunctionParameterTypeInFile()`;
+- `changeArrowFunctionReturnTypeInFile()`.
 
 Property type changes include single properties, grouped properties, partial grouped declaration splitting, promoted properties, and direct `@var` updates. Those behaviors are provided by `php-retype`; the adapter only maps the global transaction context into the retype step API and maps the result back.
 
 Class constant type changes include native type updates, direct `@var` updates, and partial grouped declaration splitting. Enum backing type changes mutate the enum backing type and rely on `php-retype` validation for `int` and `string`.
+
+Nested callable type changes include closure and arrow-function parameter and return types inside method, function, and file containers. Container resolution, zero-based DFS callable selection, native type mutation, direct PHPDoc updates, and graph refresh are provided by `php-retype`; the adapter only passes the transaction-neutral step request through the global transaction context.
 
 `php-refactor` does not call `PhpRetypeTransaction`. That transaction belongs to standalone `php-retype` usage only.
 

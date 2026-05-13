@@ -86,10 +86,24 @@ if (false === $result->isSuccessful()) {
 - `changePropertyType()`
 - `changeClassConstantType()`
 - `changeEnumBackingType()`
+- `changeClosureParameterTypeInMethod()`
+- `changeClosureReturnTypeInMethod()`
+- `changeArrowFunctionParameterTypeInMethod()`
+- `changeArrowFunctionReturnTypeInMethod()`
+- `changeClosureParameterTypeInFunction()`
+- `changeClosureReturnTypeInFunction()`
+- `changeArrowFunctionParameterTypeInFunction()`
+- `changeArrowFunctionReturnTypeInFunction()`
+- `changeClosureParameterTypeInFile()`
+- `changeClosureReturnTypeInFile()`
+- `changeArrowFunctionParameterTypeInFile()`
+- `changeArrowFunctionReturnTypeInFile()`
 
 `PhpRefactor` owns the cross-service transaction. It calls service step APIs and never nests `PhpRenameTransaction` or `PhpRetypeTransaction`.
 
 Property and class constant type changes support grouped declaration splitting through `php-retype`. Property type changes also support promoted properties and direct `@var` updates. Enum backing type changes support `int` and `string`.
+
+Nested callable type changes target closures or arrow functions inside a method, function, or file container. The callable is selected by its zero-based DFS index inside that container. `php-retype` resolves the container, mutates the native type, updates directly attached PHPDoc when available, and refreshes the graph for the next transaction step.
 
 ## Documentation
 
