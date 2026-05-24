@@ -16,19 +16,19 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/babelforge/member-graph"
+            "url": "https://github.com/babelforge/member-graph.git"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/babelforge/php-source-registry"
+            "url": "https://github.com/babelforge/php-source-registry.git"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/babelforge/php-rename"
+            "url": "https://github.com/babelforge/php-rename.git"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/babelforge/php-retype"
+            "url": "https://github.com/babelforge/php-retype.git"
         }
     ],
     "require": {
