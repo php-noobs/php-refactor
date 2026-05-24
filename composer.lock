@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/babelforge/member-graph.git",
-                "reference": "ab9a3ea9402b2be55cd1eda4c64ac36cc3a033c1"
+                "reference": "6b91810d100ccaeaee86d546953e05c3f3848528"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/babelforge/member-graph/zipball/ab9a3ea9402b2be55cd1eda4c64ac36cc3a033c1",
-                "reference": "ab9a3ea9402b2be55cd1eda4c64ac36cc3a033c1",
+                "url": "https://api.github.com/repos/babelforge/member-graph/zipball/6b91810d100ccaeaee86d546953e05c3f3848528",
+                "reference": "6b91810d100ccaeaee86d546953e05c3f3848528",
                 "shasum": ""
             },
             "require": {
@@ -72,7 +72,7 @@
                 "source": "https://github.com/babelforge/member-graph/tree/main",
                 "issues": "https://github.com/babelforge/member-graph/issues"
             },
-            "time": "2026-05-24T15:11:30+00:00"
+            "time": "2026-05-24T15:48:47+00:00"
         },
         {
             "name": "babelforge/php-rename",
@@ -80,12 +80,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/babelforge/php-rename.git",
-                "reference": "58fbc7c8e8d73f8b203f49f94a10d6467c9da238"
+                "reference": "9ba9ee4c206cbc6d896ed5cd725da90e07340ac8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/babelforge/php-rename/zipball/58fbc7c8e8d73f8b203f49f94a10d6467c9da238",
-                "reference": "58fbc7c8e8d73f8b203f49f94a10d6467c9da238",
+                "url": "https://api.github.com/repos/babelforge/php-rename/zipball/9ba9ee4c206cbc6d896ed5cd725da90e07340ac8",
+                "reference": "9ba9ee4c206cbc6d896ed5cd725da90e07340ac8",
                 "shasum": ""
             },
             "require": {
@@ -139,7 +139,7 @@
                 "source": "https://github.com/babelforge/php-rename/tree/main",
                 "issues": "https://github.com/babelforge/php-rename/issues"
             },
-            "time": "2026-05-24T15:11:30+00:00"
+            "time": "2026-05-24T15:50:37+00:00"
         },
         {
             "name": "babelforge/php-retype",
@@ -147,12 +147,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/babelforge/php-retype.git",
-                "reference": "fec4472015dbfe000c8af1a8f5350121c68925ce"
+                "reference": "1295668c5c29900c8639829f9543d24de4aa7116"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/babelforge/php-retype/zipball/fec4472015dbfe000c8af1a8f5350121c68925ce",
-                "reference": "fec4472015dbfe000c8af1a8f5350121c68925ce",
+                "url": "https://api.github.com/repos/babelforge/php-retype/zipball/1295668c5c29900c8639829f9543d24de4aa7116",
+                "reference": "1295668c5c29900c8639829f9543d24de4aa7116",
                 "shasum": ""
             },
             "require": {
@@ -206,7 +206,7 @@
                 "source": "https://github.com/babelforge/php-retype/tree/main",
                 "issues": "https://github.com/babelforge/php-retype/issues"
             },
-            "time": "2026-05-24T15:11:30+00:00"
+            "time": "2026-05-24T15:50:37+00:00"
         },
         {
             "name": "babelforge/php-source-registry",
