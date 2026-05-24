@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Application\Adapter;
+namespace BabelForge\PhpRefactor\Application\Adapter;
 
-use PhpNoobs\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionContext;
-use PhpNoobs\PhpRename\Application\PhpRename;
-use PhpNoobs\PhpRename\Domain\Rename\Conflict\RenameConflictPolicy;
-use PhpNoobs\PhpRename\Domain\Rename\Plan\RenamePlan;
-use PhpNoobs\PhpRename\Domain\Rename\Request\NestedCallableLocalVariableRenameRequest;
-use PhpNoobs\PhpRename\Domain\Rename\Request\NestedCallableRenameRequest;
-use PhpNoobs\PhpRename\Domain\Rename\Step\RenameStepContext;
-use PhpNoobs\PhpRename\Domain\Rename\Step\RenameStepResult;
+use BabelForge\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionContext;
+use BabelForge\PhpRename\Application\PhpRename;
+use BabelForge\PhpRename\Domain\Rename\Conflict\RenameConflictPolicy;
+use BabelForge\PhpRename\Domain\Rename\Plan\RenamePlan;
+use BabelForge\PhpRename\Domain\Rename\Request\NestedCallableLocalVariableRenameRequest;
+use BabelForge\PhpRename\Domain\Rename\Request\NestedCallableRenameRequest;
+use BabelForge\PhpRename\Domain\Rename\Step\RenameStepContext;
+use BabelForge\PhpRename\Domain\Rename\Step\RenameStepResult;
 
 /**
  * Adapts the global refactor context to php-rename step execution.

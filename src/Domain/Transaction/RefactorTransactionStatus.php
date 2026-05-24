@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Domain\Transaction;
+namespace BabelForge\PhpRefactor\Domain\Transaction;
 
 /**
  * Enumerates global refactor transaction statuses.

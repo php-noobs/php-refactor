@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Application\Adapter;
+namespace BabelForge\PhpRefactor\Application\Adapter;
 
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnostic;
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticSeverity;
-use PhpNoobs\PhpRename\Domain\Rename\Diagnostic\RenameDiagnosticCollection;
-use PhpNoobs\PhpRename\Domain\Rename\Diagnostic\RenameDiagnosticSeverity;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnostic;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticSeverity;
+use BabelForge\PhpRename\Domain\Rename\Diagnostic\RenameDiagnosticCollection;
+use BabelForge\PhpRename\Domain\Rename\Diagnostic\RenameDiagnosticSeverity;
 
 /**
  * Maps php-rename diagnostics to global refactor diagnostics.

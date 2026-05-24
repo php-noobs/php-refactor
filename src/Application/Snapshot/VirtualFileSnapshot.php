@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Application\Snapshot;
+namespace BabelForge\PhpRefactor\Application\Snapshot;
 
-use PhpNoobs\PhpSource\VirtualPhpSourceFile;
+use BabelForge\PhpSource\VirtualPhpSourceFile;
 use PhpParser\Node;
 
 /**

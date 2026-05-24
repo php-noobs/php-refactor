@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Tests\Integration;
+namespace BabelForge\PhpRefactor\Tests\Integration;
 
-use PhpNoobs\PhpRefactor\Application\PhpRefactor;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionStatus;
-use PhpNoobs\PhpSource\VirtualPhpSourceFileCollection;
+use BabelForge\PhpRefactor\Application\PhpRefactor;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionStatus;
+use BabelForge\PhpSource\VirtualPhpSourceFileCollection;
 use PHPUnit\Framework\TestCase;
 
 /**

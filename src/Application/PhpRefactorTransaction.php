@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Application;
+namespace BabelForge\PhpRefactor\Application;
 
-use PhpNoobs\MemberGraph\Application\Build\Factory\MemberDependencyGraphBuild;
-use PhpNoobs\MemberGraph\Application\Build\Factory\MemberDependencyGraphFactory;
-use PhpNoobs\PhpRefactor\Application\Adapter\RenameServiceAdapter;
-use PhpNoobs\PhpRefactor\Application\Adapter\RetypeServiceAdapter;
-use PhpNoobs\PhpRefactor\Application\Snapshot\VirtualFileSnapshotCollection;
-use PhpNoobs\PhpRefactor\Application\Snapshot\VirtualFileSnapshotter;
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnostic;
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticSeverity;
-use PhpNoobs\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionContext;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionStatus;
-use PhpNoobs\PhpRename\Domain\Rename\Conflict\RenameConflictPolicy;
-use PhpNoobs\PhpRename\Domain\Rename\Plan\RenamePlan;
-use PhpNoobs\PhpRename\Domain\Rename\Request\NestedCallableLocalVariableRenameRequest;
-use PhpNoobs\PhpRename\Domain\Rename\Request\NestedCallableRenameRequest;
-use PhpNoobs\PhpSource\VirtualPhpSourceFileCollection;
+use BabelForge\MemberGraph\Application\Build\Factory\MemberDependencyGraphBuild;
+use BabelForge\MemberGraph\Application\Build\Factory\MemberDependencyGraphFactory;
+use BabelForge\PhpRefactor\Application\Adapter\RenameServiceAdapter;
+use BabelForge\PhpRefactor\Application\Adapter\RetypeServiceAdapter;
+use BabelForge\PhpRefactor\Application\Snapshot\VirtualFileSnapshotCollection;
+use BabelForge\PhpRefactor\Application\Snapshot\VirtualFileSnapshotter;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnostic;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticSeverity;
+use BabelForge\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionContext;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionStatus;
+use BabelForge\PhpRename\Domain\Rename\Conflict\RenameConflictPolicy;
+use BabelForge\PhpRename\Domain\Rename\Plan\RenamePlan;
+use BabelForge\PhpRename\Domain\Rename\Request\NestedCallableLocalVariableRenameRequest;
+use BabelForge\PhpRename\Domain\Rename\Request\NestedCallableRenameRequest;
+use BabelForge\PhpSource\VirtualPhpSourceFileCollection;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\IntersectionType;
 use PhpParser\Node\Name;

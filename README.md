@@ -2,34 +2,34 @@
 
 `PhpRefactor` is the high-level transaction orchestrator for safe PHP refactoring workflows.
 
-It coordinates `php-noobs/php-rename` and `php-noobs/php-retype` operations through one global transaction. It owns transaction lifecycle, source snapshots, rollback, diagnostics aggregation, cross-service graph freshness, and final persistence.
+It coordinates `babelforge/php-rename` and `babelforge/php-retype` operations through one global transaction. It owns transaction lifecycle, source snapshots, rollback, diagnostics aggregation, cross-service graph freshness, and final persistence.
 
 ## Installation
 
 ```bash
-composer require php-noobs/php-refactor
+composer require babelforge/php-refactor
 ```
 
-When using the PhpNoobs packages from GitHub, configure the VCS repositories:
+When using the BabelForge packages from GitHub, configure the VCS repositories:
 
 ```json
 {
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/php-noobs/member-graph"
+            "url": "https://github.com/babelforge/member-graph"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/php-noobs/php-source-registry"
+            "url": "https://github.com/babelforge/php-source-registry"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/php-noobs/php-rename"
+            "url": "https://github.com/babelforge/php-rename"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/php-noobs/php-retype"
+            "url": "https://github.com/babelforge/php-retype"
         }
     ]
 }
@@ -38,7 +38,7 @@ When using the PhpNoobs packages from GitHub, configure the VCS repositories:
 ## Usage
 
 ```php
-use PhpNoobs\PhpRefactor\Application\PhpRefactor;
+use BabelForge\PhpRefactor\Application\PhpRefactor;
 use PhpParser\Node\Name;
 
 $refactor = PhpRefactor::fromDirectory(

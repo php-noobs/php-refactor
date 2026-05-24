@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Domain\Journal;
+namespace BabelForge\PhpRefactor\Domain\Journal;
 
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
-use PhpNoobs\PhpSource\VirtualPhpSourceFileCollection;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
+use BabelForge\PhpSource\VirtualPhpSourceFileCollection;
 
 /**
  * Describes one attempted action in a global refactor transaction.

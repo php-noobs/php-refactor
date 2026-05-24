@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Application;
+namespace BabelForge\PhpRefactor\Application;
 
-use PhpNoobs\MemberGraph\Application\Build\Factory\MemberDependencyGraphBuild;
-use PhpNoobs\MemberGraph\Application\Build\Factory\MemberDependencyGraphFactory;
-use PhpNoobs\PhpRefactor\Application\Adapter\RenameServiceAdapter;
-use PhpNoobs\PhpRefactor\Application\Adapter\RetypeServiceAdapter;
-use PhpNoobs\PhpRefactor\Application\Snapshot\VirtualFileSnapshotter;
-use PhpNoobs\PhpRename\Application\PhpRename;
-use PhpNoobs\PhpRetype\Application\PhpRetype;
+use BabelForge\MemberGraph\Application\Build\Factory\MemberDependencyGraphBuild;
+use BabelForge\MemberGraph\Application\Build\Factory\MemberDependencyGraphFactory;
+use BabelForge\PhpRefactor\Application\Adapter\RenameServiceAdapter;
+use BabelForge\PhpRefactor\Application\Adapter\RetypeServiceAdapter;
+use BabelForge\PhpRefactor\Application\Snapshot\VirtualFileSnapshotter;
+use BabelForge\PhpRename\Application\PhpRename;
+use BabelForge\PhpRetype\Application\PhpRetype;
 
 /**
  * Public facade for composed PHP refactoring workflows.

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Tests\Integration;
+namespace BabelForge\PhpRefactor\Tests\Integration;
 
-use PhpNoobs\PhpRefactor\Application\Adapter\RetypeServiceAdapter;
-use PhpNoobs\PhpRefactor\Application\PhpRefactor;
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
-use PhpNoobs\PhpRefactor\Domain\Journal\RefactorActionJournal;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionStatus;
-use PhpNoobs\PhpSource\VirtualPhpSourceFileCollection;
+use BabelForge\PhpRefactor\Application\Adapter\RetypeServiceAdapter;
+use BabelForge\PhpRefactor\Application\PhpRefactor;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
+use BabelForge\PhpRefactor\Domain\Journal\RefactorActionJournal;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionStatus;
+use BabelForge\PhpSource\VirtualPhpSourceFileCollection;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\NullableType;

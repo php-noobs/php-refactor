@@ -18,10 +18,10 @@ This documentation describes the `PhpRefactor` component, its orchestration role
 
 `PhpRefactor` uses these packages:
 
-- `php-noobs/member-graph` for semantic facts, source-node lookup, projected builds, and in-memory rebuilds;
-- `php-noobs/php-source-registry` for virtual source files and physical writing;
-- `php-noobs/php-rename` for safe symbol rename operations;
-- `php-noobs/php-retype` for safe native and PHPDoc type-change operations.
+- `babelforge/member-graph` for semantic facts, source-node lookup, projected builds, and in-memory rebuilds;
+- `babelforge/php-source-registry` for virtual source files and physical writing;
+- `babelforge/php-rename` for safe symbol rename operations;
+- `babelforge/php-retype` for safe native and PHPDoc type-change operations.
 
 ## Current Layout
 

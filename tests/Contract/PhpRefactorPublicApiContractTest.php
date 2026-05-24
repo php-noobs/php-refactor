@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Tests\Contract;
+namespace BabelForge\PhpRefactor\Tests\Contract;
 
-use PhpNoobs\PhpRefactor\Application\Adapter\RenameServiceAdapter;
-use PhpNoobs\PhpRefactor\Application\PhpRefactor;
-use PhpNoobs\PhpRefactor\Application\PhpRefactorTransaction;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
-use PhpNoobs\PhpRename\Application\PhpRename;
+use BabelForge\PhpRefactor\Application\Adapter\RenameServiceAdapter;
+use BabelForge\PhpRefactor\Application\PhpRefactor;
+use BabelForge\PhpRefactor\Application\PhpRefactorTransaction;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionResult;
+use BabelForge\PhpRename\Application\PhpRename;
 use PHPUnit\Framework\TestCase;
 
 /**

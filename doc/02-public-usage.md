@@ -9,7 +9,7 @@ The public API exposes composed workflows while preserving the plan-before-apply
 The facade supports rename-backed and retype-backed transactions:
 
 ```php
-use PhpNoobs\PhpRefactor\Application\PhpRefactor;
+use BabelForge\PhpRefactor\Application\PhpRefactor;
 use PhpParser\Node\Name;
 
 $refactor = PhpRefactor::fromDirectory(

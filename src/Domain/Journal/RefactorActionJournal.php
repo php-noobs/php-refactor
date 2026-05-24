@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Domain\Journal;
+namespace BabelForge\PhpRefactor\Domain\Journal;
 
 /**
  * Journal of global refactor transaction actions.

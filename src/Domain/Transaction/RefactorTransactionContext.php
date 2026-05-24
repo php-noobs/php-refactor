@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Domain\Transaction;
+namespace BabelForge\PhpRefactor\Domain\Transaction;
 
-use PhpNoobs\MemberGraph\Application\Build\Factory\MemberDependencyGraphBuild;
-use PhpNoobs\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
-use PhpNoobs\PhpRefactor\Domain\Journal\RefactorActionJournal;
-use PhpNoobs\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
-use PhpNoobs\PhpSource\VirtualPhpSourceFileCollection;
+use BabelForge\MemberGraph\Application\Build\Factory\MemberDependencyGraphBuild;
+use BabelForge\PhpRefactor\Domain\Diagnostic\RefactorDiagnosticCollection;
+use BabelForge\PhpRefactor\Domain\Journal\RefactorActionJournal;
+use BabelForge\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
+use BabelForge\PhpSource\VirtualPhpSourceFileCollection;
 
 /**
  * Carries global transaction state across service adapters.

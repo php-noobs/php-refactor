@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Domain\Diagnostic;
+namespace BabelForge\PhpRefactor\Domain\Diagnostic;
 
 /**
  * Enumerates refactor diagnostic severities.

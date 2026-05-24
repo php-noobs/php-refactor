@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PhpNoobs\PhpRefactor\Application\Adapter;
+namespace BabelForge\PhpRefactor\Application\Adapter;
 
-use PhpNoobs\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
-use PhpNoobs\PhpRefactor\Domain\Transaction\RefactorTransactionContext;
-use PhpNoobs\PhpRetype\Application\PhpRetype;
-use PhpNoobs\PhpRetype\Domain\Retype\Step\RetypeStepContext;
-use PhpNoobs\PhpRetype\Domain\Retype\Step\RetypeStepResult;
+use BabelForge\PhpRefactor\Domain\Journal\RefactorActionJournalEntry;
+use BabelForge\PhpRefactor\Domain\Transaction\RefactorTransactionContext;
+use BabelForge\PhpRetype\Application\PhpRetype;
+use BabelForge\PhpRetype\Domain\Retype\Step\RetypeStepContext;
+use BabelForge\PhpRetype\Domain\Retype\Step\RetypeStepResult;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\IntersectionType;
 use PhpParser\Node\Name;
